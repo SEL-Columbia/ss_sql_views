@@ -1,3 +1,6 @@
+# 12/20/11 10:31 PM
+# fixme: needs to use view_primary_log
+
 import psycopg2
 conn = psycopg2.connect('dbname=gateway')
 cursor = conn.cursor()
