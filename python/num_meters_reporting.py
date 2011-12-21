@@ -2,15 +2,18 @@ import psycopg2
 conn = psycopg2.connect('dbname=gateway')
 cursor = conn.cursor()
 
+# note that if no meters are reporting, a zero is not reported
+# rather that date is not present
+
 query = '''
-        select date, count(*)
-        from primary_log_view
-        where date>'2011-11-01' and
-        date<'2011-12-31' and
+        select meter_timestamp, count(*)
+        from view_primary_log
+        where meter_timestamp > '2011-11-01' and
+        meter_timestamp < '2011-12-31' and
         ip_address like '%200' and
-        name like 'ug%'
-        group by date
-        order by date;
+        meter_name like 'ug%'
+        group by meter_timestamp
+        order by meter_timestamp;
         '''
 
 shniz = cursor.execute(query)
@@ -28,7 +31,7 @@ import matplotlib.pyplot as plt
 fig = plt.figure()
 ax = fig.add_axes((0.1,0.1,0.8,0.8))
 
-ax.plot_date(dates,num_reporting, 'kx')
+ax.plot_date(dates,num_reporting, 'k-o')
 ax.set_title("Number of Mains Meters Reporting in Uganda")
 ax.set_xlabel("Date")
 ax.set_ylabel("Number of Meters")
