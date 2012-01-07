@@ -15,7 +15,7 @@ import datetime
 this_date = datetime.datetime(2011,12,1,0,0)
 
 date_start = datetime.datetime(2011,12,1)
-date_end = datetime.datetime(2011,12,22)
+date_end = datetime.datetime(2012, 1, 1)
 
 start = date_start
 while 1:
