@@ -23,7 +23,7 @@ query = """
               order by date;
         """ % (columns[0], columns[1], meter_name, date_start, date_end)
 
-shniz = cursor.execute(query)
+cursor.execute(query)
 shniz = cursor.fetchall()
 
 dates = []
