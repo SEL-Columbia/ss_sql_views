@@ -17,8 +17,8 @@ print query
 # stuff array
 result = query.execute()
 
-country = 'ml'
-#country = 'ug'
+#country = 'ml'
+country = 'ug'
 
 power_list = []
 for r in result:
@@ -33,11 +33,12 @@ import numpy as np
 #ax.hist(power_list, bins=np.linspace(0,4000,41), facecolor='#dddddd')
 ax.hist(power_list, bins=np.linspace(0,50,51), facecolor='#dddddd')
 #ax.hist(power_list)
-ax.set_xlabel('Daily Electrical Energy Consumed (Wh)')
-ax.set_ylabel('Number of Days Observed')
-ax.set_title('Mali Daily Electricity Consumption')
+ax.set_xlabel('Hourly Averaged Power (W)')
+ax.set_ylabel('Number of Hours Observed')
+#ax.set_title('Mali Power Observations')
+ax.set_title('Uganda Power Observations')
 #ax.set_title('Uganda Mains Electricity Consumption')
 #f.savefig(country+'_mains_histogram.pdf')
-f.savefig(country+'power_histogram.pdf')
+f.savefig(country+'_power_histogram.pdf')
 
 #plt.show()
