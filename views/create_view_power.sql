@@ -25,7 +25,7 @@ from
     order by
         meter_timestamp)
     as q
--- how do i deal with midnight stuff?
+    -- how do i deal with midnight stuff?
 where
     power > 0
     and time_difference = '01:00:00'
