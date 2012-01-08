@@ -16,9 +16,12 @@ print query
 # stuff array
 result = query.execute()
 
+country = 'ml'
+country = 'ug'
+
 watthour_list = []
 for r in result:
-    if 'ml' in r.name:
+    if country in r.name:
         watthour_list.append(r.watthours)
 
 # graph histogram
@@ -29,7 +32,7 @@ import numpy as np
 ax.hist(watthour_list, bins=np.linspace(0,200,41))
 ax.set_xlabel('Daily Electrical Energy Consumed (Wh)')
 ax.set_ylabel('Number of Days Observed')
-ax.set_title('Mali Daily Electricity Consumption')
-f.savefig('mali_histogram.pdf')
+ax.set_title('Uganda Daily Electricity Consumption')
+f.savefig(country+'_histogram.pdf')
 
 #plt.show()
