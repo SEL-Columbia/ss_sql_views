@@ -1,32 +1,41 @@
-import psycopg2
-conn = psycopg2.connect('dbname=gateway')
-cursor = conn.cursor()
+'''
+mains_energy.py
+===============
+janky ass old procedure that does who-knows-what
+'''
 
-meter_name = 'ug04'
-date_start = '20111001'
-date_end = '20111201'
+def mains_energy():
+    import psycopg2
+    conn = psycopg2.connect('dbname=gateway')
+    cursor = conn.cursor()
 
-query = """select *
-           from midnight_rider
-           where name = '%s' and
-                 ip_address = '192.168.1.200' and
-                 date >= '%s' and
-                 date <= '%s'
-           order by date
-        """ % (meter_name, date_start, date_end)
+    meter_name = 'ug04'
+    date_start = '20111001'
+    date_end = '20111201'
 
-shniz = cursor.execute(query)
-shniz = cursor.fetchall()
+    query = """select *
+               from midnight_rider
+               where name = '%s' and
+                     ip_address = '192.168.1.200' and
+                     date >= '%s' and
+                     date <= '%s'
+               order by date
+            """ % (meter_name, date_start, date_end)
 
-dates = []
-watthours = []
+    shniz = cursor.execute(query)
+    shniz = cursor.fetchall()
 
-for s in shniz:
-    dates.append(s[0])
-    watthours.append(s[2])
+    dates = []
+    watthours = []
 
-import pylab
-pylab.plot_date(dates,watthours)
-pylab.grid()
-pylab.show()
+    for s in shniz:
+        dates.append(s[0])
+        watthours.append(s[2])
 
+    import pylab
+    pylab.plot_date(dates,watthours)
+    pylab.grid()
+    pylab.show()
+
+if __name__ == '__main__':
+    mains_energy()
