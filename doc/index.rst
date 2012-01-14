@@ -1,10 +1,10 @@
-.. Offline Gateway Queries documentation master file, created by
-   sphinx-quickstart on Thu Jan 12 17:33:52 2012.
+.. Offline Gateway Analysis documentation master file, created by
+   sphinx-quickstart on Sat Jan 14 10:29:07 2012.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Offline Gateway Queries
-===================================================
+Welcome to Offline Gateway Analysis's documentation!
+====================================================
 
 Contents:
 
@@ -12,6 +12,7 @@ Contents:
     :maxdepth: 2
 
     intro.rst
+    installation.rst
 
 Scripts
 =======
@@ -23,7 +24,6 @@ Scripts
 .. automodule:: percentage_with_credit
 .. automodule:: solar_generation
 .. automodule:: which_meters_reporting_text
-
 
 
 Indices and tables

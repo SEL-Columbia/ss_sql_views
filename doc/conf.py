@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
-# Offline Gateway Queries documentation build configuration file, created by
-# sphinx-quickstart on Thu Jan 12 17:33:52 2012.
+# Offline Gateway Analysis documentation build configuration file, created by
+# sphinx-quickstart on Sat Jan 14 10:29:07 2012.
 #
 # This file is execfile()d with the current directory set to its containing dir.
 #
@@ -12,6 +12,7 @@
 # serve to show the default.
 
 import sys, os
+sys.path.append('../python')
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -25,7 +26,7 @@ import sys, os
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.todo', 'sphinx.ext.coverage', 'sphinx.ext.pngmath', 'sphinx.ext.viewcode']
+extensions = ['sphinx.ext.autodoc']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -40,7 +41,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Offline Gateway Queries'
+project = u'Offline Gateway Analysis'
 copyright = u'2012, Daniel Soto'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -64,7 +65,7 @@ release = '0.0'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = []
+exclude_patterns = ['_build']
 
 # The reST default role (used for this markup: `text`) to use for all documents.
 #default_role = None
@@ -164,7 +165,7 @@ html_static_path = ['_static']
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'OfflineGatewayQueriesdoc'
+htmlhelp_basename = 'OfflineGatewayAnalysisdoc'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -178,7 +179,7 @@ htmlhelp_basename = 'OfflineGatewayQueriesdoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'OfflineGatewayQueries.tex', u'Offline Gateway Queries Documentation',
+  ('index', 'OfflineGatewayAnalysis.tex', u'Offline Gateway Analysis Documentation',
    u'Daniel Soto', 'manual'),
 ]
 
@@ -211,6 +212,6 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'offlinegatewayqueries', u'Offline Gateway Queries Documentation',
+    ('index', 'offlinegatewayanalysis', u'Offline Gateway Analysis Documentation',
      [u'Daniel Soto'], 1)
 ]
