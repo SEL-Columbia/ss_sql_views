@@ -1,8 +1,16 @@
 '''
-aggregated customer energy module.py
-====================================
-queries database for all meters for all circuits that are
-not mains, adds and reports
+aggregated_customer_energy.py
+------------------------------------
+This script queries the database to return the aggregated consumer energy consumption
+for each meter.
+
+Each circuit that is not the mains has the hourly watthours added together and reported
+in a timeseries chart.
+
+In the header of the file are the configuration for dates and plot file name.
+
+Note: The meter_list variable must also be changed (around line 42)
+
 '''
 
 # query parameters
