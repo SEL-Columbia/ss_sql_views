@@ -5,6 +5,13 @@ queries database for all meters for all circuits that are
 not mains, adds and reports
 '''
 
+# query parameters
+import datetime as dt
+date_start = dt.datetime(2011,12,01)
+date_end = dt.datetime(2011,12,31)
+ip_mains = '192.168.1.200'
+figure_filename = 'uganda_dec.pdf'
+
 def aggregated_customer_energy():
     import sqlalchemy as sa
 
@@ -23,18 +30,9 @@ def aggregated_customer_energy():
         meter_list.append(r.name)
 
     # prune meter list for mali or uganda
-    meter_list = meter_list[:9]
-    #meter_list = meter_list[9:]
-    print meter_list
-
-    # query parameters
-    #meter_name = 'ml03'
-    date_start = '20111201'
-    date_end = '20111231'
-    import datetime as dt
-    date_start = dt.datetime(2011,12,01)
-    date_end = dt.datetime(2011,12,31)
-    ip_mains = '192.168.1.200'
+    #meter_list = meter_list[:9]
+    meter_list = meter_list[9:]
+    print 'meters being reported are ', meter_list
 
     # graph
     import pylab
@@ -65,7 +63,8 @@ def aggregated_customer_energy():
         ax[i].legend()
 
     #plt.show()
-    f.savefig('mali_dec.pdf')
+    f.suptitle('Aggregated Customer Watthours')
+    f.savefig(figure_filename)
 
 if __name__=='__main__':
     aggregated_customer_energy()
