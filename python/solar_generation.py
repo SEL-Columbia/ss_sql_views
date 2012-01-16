@@ -61,7 +61,7 @@ def solar_generation():
 
         meter_timestamp = [(ms-date_minimum).total_seconds() for ms in meter_timestamp]
         p = np.polyfit(meter_timestamp, solar_kwh, 1)
-        print meter_name, p[0] * 3600 * 24, 'kWh per day'
+        print meter_name, '%.1f' % (p[0] * 3600 * 24), 'kWh per day'
         fit_timebase = np.linspace(0, (date_maximum-date_minimum).total_seconds(), 10)
         fit_energy = np.polyval(p, fit_timebase)
         fit_timebase = [date_minimum + dt.timedelta(seconds=ft) for ft in fit_timebase]
