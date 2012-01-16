@@ -13,6 +13,7 @@ Contents:
 
     intro.rst
     installation.rst
+    views.rst
 
 Scripts
 =======
