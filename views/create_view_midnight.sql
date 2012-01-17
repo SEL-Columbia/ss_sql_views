@@ -2,11 +2,13 @@ drop view view_midnight;
 
 create view view_midnight as
 select distinct
-       l.date,
+       l.date as meter_timestamp,
        p.circuit_id,
        p.watthours,
+       p.credit,
        c.ip_address,
-       m.name
+       c.pin,
+       m.name as meter_name
 from primary_log as p
 join
   log as l
