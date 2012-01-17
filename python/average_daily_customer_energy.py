@@ -38,6 +38,7 @@ result = query.execute()
 
 # print result
 daily_watthours = []
+print 'meter_name.ip_address, average_watthours, num_data_points'
 for r in result:
     print r.meter_name + '.' + r.ip_address[-3:] + '  %.1f' % r.myavg + '  ' + str(r.mycount)
     daily_watthours.append(r.myavg)
