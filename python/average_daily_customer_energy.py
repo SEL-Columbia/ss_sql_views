@@ -33,6 +33,12 @@ result = query.execute()
 
 # print result
 i=0
+daily_watthours = []
 for r in result:
-    print r.meter_name + '.' + r.ip_address[-3:] + '  %.1f' % r.myavg
-    i+=1
+    if 'ml' in r.meter_name:
+        print r.meter_name + '.' + r.ip_address[-3:] + '  %.1f' % r.myavg
+        daily_watthours.append(r.myavg)
+import numpy as np
+daily_watthours = np.array(daily_watthours)
+print 'mean =', '%.1f' % daily_watthours.mean()
+print 'std  =', '%.1f' % daily_watthours.std()
