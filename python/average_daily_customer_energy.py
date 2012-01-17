@@ -8,6 +8,9 @@ import datetime as dt
 date_start = dt.datetime(2010,12,1)
 date_end = dt.datetime(2012,12,31)
 
+country_select = 'ml'
+country_select = 'ug'
+
 # create metadata object
 metadata = sa.MetaData('postgres://postgres:postgres@localhost:5432/gateway')
 
@@ -22,7 +25,8 @@ query = sa.select([vm.c.meter_name,
                    whereclause=sa.and_(vm.c.watthours>0,
                                        vm.c.ip_address!='192.168.1.200',
                                        vm.c.meter_timestamp>date_start,
-                                       vm.c.meter_timestamp<date_end
+                                       vm.c.meter_timestamp<date_end,
+                                       vm.c.meter_name.like('%' + country_select + '%')
                    ),
                    distinct=True,
                    order_by=sa.desc('myavg')
@@ -32,12 +36,11 @@ print query
 result = query.execute()
 
 # print result
-i=0
 daily_watthours = []
 for r in result:
-    if 'ml' in r.meter_name:
-        print r.meter_name + '.' + r.ip_address[-3:] + '  %.1f' % r.myavg
-        daily_watthours.append(r.myavg)
+    print r.meter_name + '.' + r.ip_address[-3:] + '  %.1f' % r.myavg
+    daily_watthours.append(r.myavg)
+
 import numpy as np
 daily_watthours = np.array(daily_watthours)
 print 'mean =', '%.1f' % daily_watthours.mean()
