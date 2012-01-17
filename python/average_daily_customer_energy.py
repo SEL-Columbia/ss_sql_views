@@ -5,11 +5,11 @@ calculates average energy ignoring zeros for every circuit and returns text dump
 import sqlalchemy as sa
 import datetime as dt
 
-date_start = dt.datetime(2010,12,1)
-date_end = dt.datetime(2012,12,31)
+date_start = dt.datetime(2011,12,1)
+date_end = dt.datetime(2011,12,31)
 
 country_select = 'ml'
-country_select = 'ug'
+#country_select = 'ug'
 
 # create metadata object
 metadata = sa.MetaData('postgres://postgres:postgres@localhost:5432/gateway')
@@ -20,7 +20,8 @@ vm = sa.Table('view_midnight', metadata, autoload=True)
 # get meter list from database
 query = sa.select([vm.c.meter_name,
                    vm.c.ip_address,
-                   sa.func.avg(vm.c.watthours).over(partition_by=vm.c.circuit_id).label('myavg')
+                   sa.func.avg(vm.c.watthours).over(partition_by=vm.c.circuit_id).label('myavg'),
+                   sa.func.count(vm.c.watthours).over(partition_by=vm.c.circuit_id).label('mycount')
                    ],
                    whereclause=sa.and_(vm.c.watthours>0,
                                        vm.c.ip_address!='192.168.1.200',
@@ -38,7 +39,7 @@ result = query.execute()
 # print result
 daily_watthours = []
 for r in result:
-    print r.meter_name + '.' + r.ip_address[-3:] + '  %.1f' % r.myavg
+    print r.meter_name + '.' + r.ip_address[-3:] + '  %.1f' % r.myavg + '  ' + str(r.mycount)
     daily_watthours.append(r.myavg)
 
 import numpy as np
