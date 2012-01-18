@@ -118,6 +118,9 @@ def percentage_with_credit():
 
     # plot out pairs
     for k in edk.intersection(pcdk):
+        print k, ',',
+        print energy_dict[k], ',',
+        print percentage_with_credit_dict[k]
         ax.plot(energy_dict[k], percentage_with_credit_dict[k], 'ko')
 
     ax.set_xlabel('Average Daily Energy Use (Wh)')
