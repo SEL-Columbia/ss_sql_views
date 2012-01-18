@@ -2,38 +2,126 @@
 percentage_with_credit.py
 =========================
 Determines for what fraction of reporting hours customers have credit greater than zero.
+
+Performs query for number of hours reporting with credit above zero.  Performs a second
+query with number of hours reporting total for each circuit.
+
+Modeled after Figure 11 in the ICTD 2012 paper.
+
 '''
 
 from __future__ import division
 
+import datetime as dt
+
+date_start = dt.datetime(2000, 12, 01)
+date_end   = dt.datetime(2020, 01, 01)
+figure_file_name = 'percentage_with_credit.pdf'
+
 def percentage_with_credit():
-    import sqlalchemy
+    #def percentage_with_credit():
+    import sqlalchemy as sa
 
-    conn_string = 'postgres://postgres:postgres@localhost:5432/gateway'
-    engine = sqlalchemy.create_engine(conn_string)
+    # create metadata object
+    metadata = sa.MetaData('postgres://postgres:postgres@localhost:5432/gateway')
 
-    metadata = sqlalchemy.MetaData()
-    metadata.bind = engine
+    # define table objects from database
+    vpl = sa.Table('view_primary_log', metadata, autoload=True)
+    vm = sa.Table('view_midnight', metadata, autoload=True)
 
-    # gets all the table info for free
-    view_primary_log = sqlalchemy.Table('view_primary_log', metadata, autoload=True)
+    # get average daily from midnight table
+    query = sa.select([vm.c.circuit_id,
+                       sa.func.avg(vm.c.watthours).over(partition_by=vm.c.circuit_id).label('watthours')],
+                       whereclause=sa.and_(vm.c.meter_timestamp>date_start,
+                                           vm.c.meter_timestamp<date_end),
+                       order_by=vm.c.circuit_id,
+                       distinct=True)
+
+    print query
+
+    result = query.execute()
+
+    energy_dict = {}
+    for r in result:
+        energy_dict[r.circuit_id] = r.watthours
+
+    # get set of keys from energy dict
+    edk = set(energy_dict.keys())
 
 
-    query = view_primary_log.select(view_primary_log.c.credit == 500).execute()
-    query = view_primary_log.count(view_primary_log.c.credit <= 0).execute()
+    # count number of hours per circuit with credit greater than zero
+    query = sa.select([vpl.c.circuit_id,
+                       sa.func.count(vpl.c.circuit_id).over(partition_by=vpl.c.circuit_id).label('count')],
+                       whereclause=sa.and_(vpl.c.credit>0,
+                                           vpl.c.meter_timestamp>date_start,
+                                           vpl.c.meter_timestamp<date_end),
+                       order_by=vpl.c.circuit_id,
+                       distinct=True)
+
+    print query
+
+    result = query.execute()
+
+    circuit_ids = []
+    hours_with_credit = []
+    non_zero_hours_dict = {}
+    for r in result:
+        circuit_ids.append(r.circuit_id)
+        hours_with_credit.append(r.count)
+        non_zero_hours_dict[r.circuit_id] = r.count
+
+    nzdk = set(non_zero_hours_dict.keys())
+
+    # count number of hours per circuit reporting total
+    query = sa.select([vpl.c.circuit_id,
+                       sa.func.count(vpl.c.circuit_id).over(partition_by=vpl.c.circuit_id).label('count')],
+                       whereclause=sa.and_(vpl.c.meter_timestamp>date_start,
+                                           vpl.c.meter_timestamp<date_end),
+                       order_by=vpl.c.circuit_id,
+                       distinct=True)
+
+    print query
+
+    result = query.execute()
+
+    circuit_ids = []
+    total_hours = []
+    total_hours_dict = {}
+    for r in result:
+        circuit_ids.append(r.circuit_id)
+        total_hours.append(r.count)
+        total_hours_dict[r.circuit_id] = r.count
+
+    thdk = set(total_hours_dict.keys())
 
 
-    for q in query:
-        zero = q[0]
-        #print q['credit'], q['meter_timestamp'].isoformat()
+    import numpy as np
+    hours_with_credit = np.array(hours_with_credit)
+    total_hours = np.array(total_hours)
 
-    query = view_primary_log.count(view_primary_log.c.credit > 0).execute()
-    for q in query:
-        nonzero = q[0]
+    #percentage_with_credit = hours_with_credit / (total_hours)
 
-    print 'samples with zero =', zero
-    print 'samples with nonzero =', nonzero
-    print 'percentage time with credit =', nonzero / (nonzero + zero)
+    #print percentage_with_credit
+
+    # create dictionary with circuits found in both queries
+    percentage_with_credit_dict = {}
+    for k in nzdk.intersection(thdk):
+        percentage_with_credit_dict[k] = non_zero_hours_dict[k] / total_hours_dict[k]
+    pcdk = set(percentage_with_credit_dict.keys())
+
+    #print percentage_with_credit_dict
+
+    import matplotlib.pyplot as plt
+    f, ax = plt.subplots(1,1)
+
+    # prune energy dict of keys that don't exist in percentage_with_credit_dict
+    for k in edk.intersection(pcdk):
+        ax.plot(energy_dict[k], percentage_with_credit_dict[k], 'ko')
+
+    ax.set_xlabel('Average Daily Energy Use (Wh)')
+    ax.set_ylabel('Fraction of Time with Credit Available')
+
+    f.savefig(figure_file_name)
 
 if __name__ == '__main__':
     percentage_with_credit()
