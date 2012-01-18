@@ -20,6 +20,7 @@ date_start = dt.datetime(2011, 12, 01)
 date_end   = dt.datetime(2012, 01, 01)
 figure_file_name = 'percentage_with_credit.pdf'
 mains_ip = '192.168.1.200'
+meter_name = 'ug02'
 
 def percentage_with_credit():
     #def percentage_with_credit():
@@ -38,6 +39,7 @@ def percentage_with_credit():
                        sa.func.avg(vm.c.watthours).over(partition_by=vm.c.circuit_id).label('watthours')],
                        whereclause=sa.and_(vm.c.meter_timestamp>date_start,
                                            vm.c.meter_timestamp<date_end,
+                                           vm.c.meter_name==meter_name,
                                            vm.c.ip_address!=mains_ip),
                        order_by=vm.c.circuit_id,
                        distinct=True)
@@ -58,6 +60,7 @@ def percentage_with_credit():
                        whereclause=sa.and_(vpl.c.credit>0,
                                            vpl.c.meter_timestamp>date_start,
                                            vpl.c.meter_timestamp<date_end,
+                                           vpl.c.meter_name==meter_name,
                                            vpl.c.ip_address!=mains_ip),
                        order_by=vpl.c.circuit_id,
                        distinct=True)
@@ -80,6 +83,7 @@ def percentage_with_credit():
                        sa.func.count(vpl.c.circuit_id).over(partition_by=vpl.c.circuit_id).label('count')],
                        whereclause=sa.and_(vpl.c.meter_timestamp>date_start,
                                            vpl.c.meter_timestamp<date_end,
+                                           vpl.c.meter_name==meter_name,
                                            vpl.c.ip_address!=mains_ip),
                        order_by=vpl.c.circuit_id,
                        distinct=True)
