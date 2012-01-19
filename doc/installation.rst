@@ -43,6 +43,11 @@ to generate docs, navigate to doc/ directory and run::
     > make latexpdf
 
 
+versions needed
+---------------
+On my development machine OSX 10.6.8, I have
+python 2.7.2 and
+sqlalchemy 0.7.4
 
 get fresh copy of database
 --------------------------

@@ -25,7 +25,7 @@ Scripts
 .. automodule:: percentage_with_credit
 .. automodule:: solar_generation
 .. automodule:: which_meters_reporting_text
-
+.. automodule:: which_meters_reporting_CSV
 
 Indices and tables
 ==================
