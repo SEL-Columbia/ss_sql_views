@@ -1,8 +1,9 @@
 '''
 plot_solar_power_generation.py
 ==============================
-this script plots the hourly solar power generated
+this script plots the average hourly solar power generated
 '''
+
 import datetime as dt
 date_start = dt.datetime(2011, 12, 01)
 date_end   = dt.datetime(2011, 12, 31)

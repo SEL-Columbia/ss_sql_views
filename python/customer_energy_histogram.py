@@ -1,7 +1,7 @@
 '''
 customer_energy_histogram.py
 ============================
-Creates a histogram of individual customer midnight samples over
+Creates a histogram of non-zero individual customer midnight samples over
 a given date range and given country.
 '''
 def customer_energy_histogram():
