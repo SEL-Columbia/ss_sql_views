@@ -30,7 +30,7 @@ def solar_generation():
         meter_list.append(r.meter_name)
 
     import matplotlib.pyplot as plt
-    f, ax = plt.subplots(len(meter_list), 1)
+    f, ax = plt.subplots(len(meter_list), 1, sharex=True, sharey=True, figsize=(10, 20))
 
     for i, meter_name in enumerate(meter_list):
         # get data in date range
