@@ -71,6 +71,7 @@ def aggregated_customer_energy():
         ax[i].set_xlim((date_start, date_end))
         ax[i].set_yticks((0,500,1000,1500))
         ax[i].legend(loc=[1,0])
+        ax[i].grid(True)
 
     #plt.show()
     f.suptitle('Aggregated Customer Watthours')
