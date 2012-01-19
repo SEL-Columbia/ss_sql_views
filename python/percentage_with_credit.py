@@ -36,6 +36,8 @@ def percentage_with_credit():
     print 'executing energy query'
     # get average daily from midnight table
     query = sa.select([vm.c.circuit_id,
+                       vm.c.ip_address,
+                       vm.c.meter_name,
                        sa.func.avg(vm.c.watthours).over(partition_by=vm.c.circuit_id).label('watthours')],
                        whereclause=sa.and_(vm.c.meter_timestamp>date_start,
                                            vm.c.meter_timestamp<date_end,
@@ -47,8 +49,10 @@ def percentage_with_credit():
     result = query.execute()
 
     energy_dict = {}
+    circuit_info_dict = {}
     for r in result:
         energy_dict[r.circuit_id] = r.watthours
+        circuit_info_dict[r.circuit_id] = r.meter_name + '.' + r.ip_address[-3:]
 
     # get set of keys from energy dict
     edk = set(energy_dict.keys())
@@ -119,6 +123,7 @@ def percentage_with_credit():
     # plot out pairs
     for k in edk.intersection(pcdk):
         print k, ',',
+        print circuit_info_dict[k], ',',
         print energy_dict[k], ',',
         print percentage_with_credit_dict[k]
         ax.plot(energy_dict[k], percentage_with_credit_dict[k], 'ko')
