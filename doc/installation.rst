@@ -8,6 +8,15 @@ download repo from github::
 os x installation notes
 -----------------------
 
+We are going to install 
+
+Pip        - a library that allows for downloading of python libraries
+PostgreSQL - a database
+psycopg2   - a library that allows python to talk to postgresql
+SQLalchemy - a library that allows python to talk to databases 
+
+
+
 download PostgreSQL from::
 
     http://www.enterprisedb.com/products-services-training/pgdownload#osx
@@ -29,6 +38,7 @@ install psycopg2 (on os x, i had to install this from source) download then,::
 install sqlalchemy::
 
     > easy_install sqlalchemy
+
 
 documentation
 -------------
