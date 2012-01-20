@@ -19,6 +19,7 @@ date_start = dt.datetime(2011,01,01)
 date_end = dt.datetime(2012,02,01)
 ip_mains = '192.168.1.200'
 figure_filename = 'all_customers.pdf'
+filter_zeros = True
 
 def aggregated_customer_energy():
     import sqlalchemy as sa
@@ -66,6 +67,15 @@ def aggregated_customer_energy():
         for r in result:
             watthours.append(r.sum_1)
             dates.append(r.meter_timestamp)
+
+        # filter out any where sum is zero
+        if filter_zeros:
+            import numpy as np
+            watthours = np.array(watthours)
+            dates = np.array(dates)
+            mask = watthours > 0
+            watthours = watthours[mask]
+            dates = dates[mask]
 
         ax[i].plot_date(dates,watthours,label=meter_name)
         ax[i].set_xlim((date_start, date_end))
