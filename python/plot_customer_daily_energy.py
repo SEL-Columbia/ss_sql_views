@@ -12,7 +12,8 @@ import sqlalchemy as sa
 import matplotlib.pyplot as plt
 import datetime as dt
 
-date_end = '2012-02-02'
+date_start = dt.datetime(2011, 1, 1)
+date_end = dt.datetime(2012, 2, 1)
 
 def plot_customer_daily_energy():
     metadata = sa.MetaData('postgres://postgres:postgres@localhost:5432/gateway')
@@ -36,7 +37,8 @@ def plot_customer_daily_energy():
         query = sa.select([vmid.c.watthours,
                            vmid.c.meter_timestamp],
                            whereclause=sa.and_(vmid.c.circuit_id==c[0],
-                                               vmid.c.meter_timestamp<date_end),
+                                               vmid.c.meter_timestamp<date_end,
+                                               vmid.c.meter_timestamp>date_start),
                            order_by=vmid.c.meter_timestamp)
         result = query.execute()
         dates = []
@@ -50,6 +52,7 @@ def plot_customer_daily_energy():
         ax.set_xlabel('Date')
         ax.set_ylabel('Daily Watthours')
         ax.set_title(filename)
+        f.autofmt_xdate()
         f.savefig(filename)
         plt.close()
 
