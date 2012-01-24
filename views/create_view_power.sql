@@ -12,6 +12,8 @@ from
         watthours,
         meter_name,
         ip_address,
+        circuit_id,
+        pin,
         watthours - lag(watthours,1)
             over (partition by ip_address, meter_name
             order by meter_timestamp)
@@ -27,6 +29,7 @@ from
     as q
     -- how do i deal with midnight stuff?
 where
-    power > 0
-    and time_difference = '01:00:00'
+    --power > 0
+    --and
+    time_difference = '01:00:00'
 ;
