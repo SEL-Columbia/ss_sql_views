@@ -1,6 +1,25 @@
 Sources of Error
 ================
 
+Early ssmeter reset bug
+-----------------------
+
+This is a bug in the metering software that causes the watthour value
+to be reset at 11pm instead of midnight.  This gives the false reading
+of very low power for the day.
+
+Frequency of occurence:
+
+- we will run a query to determine how often this happens.
+
+Possible algorithms to avoid:
+
+- thresholding
+- excluding based on watthour drop
+- using only days with 24 hours of data
+- using maximum for each day
+
+
 Incomplete day of data
 ----------------------
 
@@ -25,21 +44,6 @@ Methods of identification
 - look for change in 'parasitic' consumption of meter
 
 
-Early ssmeter reset bug
------------------------
-
-This is a bug in the metering software that causes the watthour value
-to be reset at 11pm instead of midnight.  This gives the false reading
-of very low power for the day.
-
-Frequency of occurence:
-
-- we will run a query to determine how often this happens.
-
-Possible algorithms to avoid:
-
-- thresholding
-- excluding based on watthour drop
 
 
 
