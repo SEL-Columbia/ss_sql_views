@@ -1,5 +1,14 @@
 '''
-calculates average energy ignoring zeros for every circuit and returns text dump
+calculates average energy per circuit over data range.
+
+can filter by country
+
+currently ignoring zeros for every circuit and returns csv text dump
+
+can direct text to file by calling script as ::
+
+    python average_daily_customer_energy.py > outfile.csv
+
 '''
 
 import sqlalchemy as sa
@@ -18,7 +27,8 @@ metadata = sa.MetaData('postgres://postgres:postgres@localhost:5432/gateway')
 vm = sa.Table('view_midnight', metadata, autoload=True)
 
 # get meter list from database
-query = sa.select([vm.c.meter_name,
+query = sa.select([vm.c.pin,
+                   vm.c.meter_name,
                    vm.c.ip_address,
                    sa.func.avg(vm.c.watthours).over(partition_by=vm.c.circuit_id).label('myavg'),
                    sa.func.count(vm.c.watthours).over(partition_by=vm.c.circuit_id).label('mycount')
@@ -33,17 +43,20 @@ query = sa.select([vm.c.meter_name,
                    order_by=sa.desc('myavg')
                    )
 
-print query
+#print query
 result = query.execute()
 
 # print result
 daily_watthours = []
-print 'meter_name.ip_address, average_watthours, num_data_points'
+print 'pin, meter_name.ip_address, average_watthours, num_data_points'
 for r in result:
-    print r.meter_name + '.' + r.ip_address[-3:] + '  %.1f' % r.myavg + '  ' + str(r.mycount)
+    print r.pin + ',',
+    print r.meter_name + '.' + r.ip_address[-3:] + ',',
+    print '%.1f' % r.myavg + ',',
+    print str(r.mycount)
     daily_watthours.append(r.myavg)
 
 import numpy as np
 daily_watthours = np.array(daily_watthours)
-print 'mean =', '%.1f' % daily_watthours.mean()
-print 'std  =', '%.1f' % daily_watthours.std()
+#print 'mean =', '%.1f' % daily_watthours.mean()
+#print 'std  =', '%.1f' % daily_watthours.std()
