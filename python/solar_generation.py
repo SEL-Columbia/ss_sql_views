@@ -5,6 +5,9 @@ this script fits a line to the solar kwh data to determine
 the average daily kwh performance of the solar panel system
 
 it also plots the cumulative kwh performance and the fit line.
+
+note: for some reason ml02 has no real data and breaks the script so i've manually
+avoided that meter around line 33.
 '''
 
 import datetime as dt
@@ -27,7 +30,10 @@ def solar_generation():
     meter_list = []
     result = query.execute()
     for r in result:
+        if r.meter_name == 'ml02':
+            continue
         meter_list.append(r.meter_name)
+
 
     import matplotlib.pyplot as plt
     f, ax = plt.subplots(len(meter_list), 1, sharex=True, sharey=True, figsize=(10, 20))
@@ -54,21 +60,25 @@ def solar_generation():
 
 
         # report slope, show graph
-        ax[i].plot_date(meter_timestamp, solar_kwh)
+        ax[i].plot_date(meter_timestamp, solar_kwh, label=meter_name)
 
         date_minimum = min(meter_timestamp)
         date_maximum = max(meter_timestamp)
 
         meter_timestamp = [(ms-date_minimum).total_seconds() for ms in meter_timestamp]
         p = np.polyfit(meter_timestamp, solar_kwh, 1)
-        print meter_name, '%.1f' % (p[0] * 3600 * 24), 'kWh per day'
+        output_string = '%.1f kWh per day' % (p[0] * 3600 * 24)
+        print meter_name, output_string#'%.1f' % (p[0] * 3600 * 24), 'kWh per day'
+        ax[i].text(0.05, 0.7, output_string, transform=ax[i].transAxes)
         fit_timebase = np.linspace(0, (date_maximum-date_minimum).total_seconds(), 10)
         fit_energy = np.polyval(p, fit_timebase)
         fit_timebase = [date_minimum + dt.timedelta(seconds=ft) for ft in fit_timebase]
 
-        ax[i]. plot_date(fit_timebase, fit_energy, 'k')
+        ax[i].plot_date(fit_timebase, fit_energy, 'k')
+        ax[i].legend()
 
 
+    f.autofmt_xdate()
     f.savefig('solar_generation.pdf')
 
 
