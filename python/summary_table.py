@@ -53,7 +53,7 @@ def query_max_power(date_start, date_end, meter_name):
 import datetime as dt
 date_start = dt.datetime(2012,01,01)
 date_end = dt.datetime(2012,02,01)
-meter_name = 'ml01'
+meter_name = 'ug08'
 columns = ('avg_energy', 'days_reporting', 'max_energy', 'max_power')
 
 
@@ -67,7 +67,7 @@ data = {}
 for r in result:
     if r.ip_address not in data.keys():
         data[r.ip_address] = {}
-    data[r.ip_address]['avg_energy']=r.myavg
+    data[r.ip_address]['avg_energy']='%.1f' % r.myavg
     data[r.ip_address]['max_energy']=r.mymax
     data[r.ip_address]['days_reporting']=r.mycount
 
@@ -97,7 +97,7 @@ for key in keys:
     print key,
     for col in columns:
         if col in data[key].keys():
-            print str(data[key][col]).rjust(15),
+            print str(data[key][col]).rjust(10),
         else:
-            print 'nan'.rjust(15),
+            print '-'.rjust(10),
     print
