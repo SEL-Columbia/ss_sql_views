@@ -2,9 +2,12 @@
 plot_customer_daily_energy.py
 -----------------------------
 
-Loops through all circuits and creates pdf of daily watthours.
+Loops through all circuits and creates pdf of daily watthours and credit.
 
-Watthours are calculated based on the midnight sample.
+Watthours are calculated based on the midnight sample.  This has a main
+weakness due to the watthour reset bug.
+
+Also includes linear fit to gauge if energy use is increasing over time.
 
 '''
 
@@ -24,8 +27,8 @@ def plot_customer_daily_energy():
     query = sa.select([vm.c.circuit_id,
                        vm.c.meter_name,
                        vm.c.ip_address],
-                       order_by=(vm.c.meter_name, vm.c.ip_address)#,
-                       #limit=10
+                       order_by=(vm.c.meter_name, vm.c.ip_address),
+                       #limit=3
                        )
     result = query.execute()
     circuit_list = []
@@ -34,7 +37,6 @@ def plot_customer_daily_energy():
 
     # iterate over list of circuits
     for c in circuit_list:
-        print c
         filename = 'pcde-' + c[1] + '-' + c[2][-3:] + '.pdf'
         query = sa.select([vmid.c.watthours,
                            vmid.c.credit,
@@ -53,8 +55,38 @@ def plot_customer_daily_energy():
             dates.append(r.meter_timestamp)
             watthours.append(r.watthours)
             credit.append(r.credit)
+
+        if len(dates) == 0:
+            continue
+
         # plot each circuit daily energy values for all time
         f, ax = plt.subplots(2,1, sharex=True)
+
+
+        # fit linear slope to watthour data
+        import numpy as np
+        dates = np.array(dates)
+        watthours = np.array(watthours)
+
+        date_max = max(dates)
+        date_min = min(dates)
+
+        # convert dates to seconds with t=0 as first sample
+        meter_timestamp = [(d-date_min).total_seconds() for d in dates]
+        p = np.polyfit(meter_timestamp, watthours, 1)
+        output_string = '%.3f kWh per day' % (p[0] * 3600 * 24)
+        #print output_string#'%.1f' % (p[0] * 3600 * 24), 'kWh per day'
+        print str(c[0]) + ',' + str(c[1]) + ',' + str(c[2]) + ',',
+        print ('%.1f' % watthours.mean()) + ',',
+        print ('%.3f' % (p[0] * 3600 * 24))
+        ax[0].text(0.05, 0.7, output_string, transform=ax[0].transAxes)
+        fit_timebase = np.linspace(0, (date_max - date_min).total_seconds(), 10)
+        fit_energy = np.polyval(p, fit_timebase)
+        fit_timebase = [date_min + dt.timedelta(seconds=ft) for ft in fit_timebase]
+        ax[0].plot_date(fit_timebase, fit_energy, 'k')
+        #ax[0].legend()
+
+
         ax[0].plot_date(dates, watthours, mfc='#dddddd')
         ax[0].set_xlabel('Date')
         ax[0].set_ylabel('Daily Watthours')
