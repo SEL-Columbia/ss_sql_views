@@ -21,7 +21,11 @@ date_end = dt.datetime(2012, 2, 1)
 def plot_customer_daily_energy():
     metadata = sa.MetaData('postgres://postgres:postgres@localhost:5432/gateway')
     vm = sa.Table('view_meter', metadata, autoload=True )
+
+    method = 'no_reset'
+
     vmid = sa.Table('view_midnight', metadata, autoload=True)
+    vp = sa.Table('view_power', metadata, autoload=True)
 
     # get list of circuits
     query = sa.select([vm.c.circuit_id,
@@ -47,6 +51,20 @@ def plot_customer_daily_energy():
                                                #vmid.c.watthours>0
                                                ),
                            order_by=vmid.c.meter_timestamp)
+
+        if method == 'no_reset':
+            query = sa.select([vp.c.watthours,
+                               vp.c.credit,
+                               vp.c.meter_timestamp],
+                               whereclause=sa.and_(vp.c.circuit_id==c[0],
+                                                   vp.c.meter_timestamp<date_end,
+                                                   vp.c.meter_timestamp>date_start,
+                                                   vp.c.power>0,
+                                                   sa.extract('hour',vp.c.meter_timestamp)==0),
+                                order_by=vp.c.meter_timestamp)
+
+
+
         result = query.execute()
         dates = []
         watthours = []
