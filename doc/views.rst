@@ -22,6 +22,10 @@ a single hour.
 view_solar_power
 ----------------
 
+view_recharge
+-------------
+
+Contains a join that allows us to look at commerce activity.
 
 
 view_solar
