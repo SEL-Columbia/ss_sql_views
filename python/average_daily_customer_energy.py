@@ -1,4 +1,9 @@
 '''
+average_daily_customer_energy.py
+================================
+
+right now, this script is being used to create a csv that will be joined to survey data.
+
 calculates average energy per circuit over data range.
 
 can filter by country
@@ -8,6 +13,10 @@ currently ignoring zeros for every circuit and returns csv text dump
 can direct text to file by calling script as ::
 
     python average_daily_customer_energy.py > outfile.csv
+
+todo: add column for percentage of time with credit
+
+todo: add column for energy consumption growth
 
 '''
 
@@ -19,6 +28,8 @@ date_end = dt.datetime(2011,12,31)
 
 country_select = 'ml'
 #country_select = 'ug'
+
+meter_list = ('ml01', 'ml02', 'ml03', 'ml04', 'ml07', 'ml08')
 
 # create metadata object
 metadata = sa.MetaData('postgres://postgres:postgres@localhost:5432/gateway')
@@ -37,7 +48,8 @@ query = sa.select([vm.c.pin,
                                        vm.c.ip_address!='192.168.1.200',
                                        vm.c.meter_timestamp>date_start,
                                        vm.c.meter_timestamp<date_end,
-                                       vm.c.meter_name.like('%' + country_select + '%')
+                                       #vm.c.meter_name.like('%' + country_select + '%')
+                                       vm.c.meter_name.in_(meter_list)
                    ),
                    distinct=True,
                    order_by=sa.desc('myavg')
