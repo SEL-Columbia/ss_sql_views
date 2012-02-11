@@ -22,4 +22,6 @@ join
     meter as m
 on
     c.meter=m.id
-where extract(hour from l.date)=0;
+where
+    extract(hour from l.date)=0;
+
