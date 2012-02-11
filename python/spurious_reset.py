@@ -34,12 +34,12 @@ def get_list_of_circuits():
     return circuit_list
 
 
-date_start = dt.datetime(2011, 12, 1)
+date_start = dt.datetime(2011,  9, 1)
 date_end   = dt.datetime(2012,  2, 1)
 
 metadata = sa.MetaData('postgres://postgres:postgres@localhost:5432/gateway')
 vm = sa.Table('view_meter', metadata, autoload=True )
-vp = sa.Table('view_power', metadata, autoload=True)
+vp = sa.Table('view_power_table', metadata, autoload=True)
 
 query = sa.select([vm.c.meter_name],
                    order_by=(vm.c.meter_name),
@@ -52,26 +52,33 @@ for r in result:
 #print meter_list
 
 # get list of circuits
+circuit_list = get_list_of_circuits()
 
 result_list = []
-for meter_name in meter_list:
+#for meter_name in meter_list:
+for circuit_dict in circuit_list:
+    circuit_id = circuit_dict['circuit_id']
     #print c
+    # query to find decrease in watthours between 11pm and midnight
     query = sa.select([sa.func.count(vp.c.power).label('reset_count')],
                        whereclause=sa.and_(vp.c.meter_timestamp>date_start,
                                            vp.c.meter_timestamp<date_end,
-                                           vp.c.meter_name==meter_name,
+                                           vp.c.circuit_id==circuit_id,
                                            vp.c.power<0,
+                                           vp.c.time_difference=='01:00:00',
                                            sa.extract('hour', vp.c.meter_timestamp)==0)
                      )
     result = query.execute()
 
     for r in result:
-        print meter_name, r.reset_count,
+        print circuit_id, circuit_dict['meter_name'], circuit_dict['ip_address'], r.reset_count,
 
+    # query to find increase or same in watthours between 11pm and midnight
     query2 = sa.select([sa.func.count(vp.c.power).label('reset_count')],
                        whereclause=sa.and_(vp.c.meter_timestamp>date_start,
                                            vp.c.meter_timestamp<date_end,
-                                           vp.c.meter_name==meter_name,
+                                           vp.c.circuit_id==circuit_id,
+                                           vp.c.time_difference=='01:00:00',
                                            vp.c.power>=0,
                                            sa.extract('hour', vp.c.meter_timestamp)==0)
                      )
