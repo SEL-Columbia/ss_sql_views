@@ -12,6 +12,7 @@ from
         watthours,
         meter_name,
         ip_address,
+        credit,
         circuit_id,
         pin,
         watthours - lag(watthours,1)
