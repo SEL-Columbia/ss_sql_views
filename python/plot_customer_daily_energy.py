@@ -15,7 +15,7 @@ import sqlalchemy as sa
 import matplotlib.pyplot as plt
 import datetime as dt
 
-date_start = dt.datetime(2011, 1, 1)
+date_start = dt.datetime(2011, 9, 1)
 date_end = dt.datetime(2012, 2, 1)
 
 def plot_customer_daily_energy():
@@ -25,7 +25,7 @@ def plot_customer_daily_energy():
     method = 'no_reset'
 
     vmid = sa.Table('view_midnight', metadata, autoload=True)
-    vp = sa.Table('view_power', metadata, autoload=True)
+    vp = sa.Table('view_power_table', metadata, autoload=True)
 
     # get list of circuits
     query = sa.select([vm.c.circuit_id,
@@ -59,11 +59,11 @@ def plot_customer_daily_energy():
                                whereclause=sa.and_(vp.c.circuit_id==c[0],
                                                    vp.c.meter_timestamp<date_end,
                                                    vp.c.meter_timestamp>date_start,
-                                                   vp.c.power>0,
+                                                   vp.c.watthours>0,
+                                                   vp.c.power>=0,
+                                                   vp.c.time_difference=='01:00:00',
                                                    sa.extract('hour',vp.c.meter_timestamp)==0),
                                 order_by=vp.c.meter_timestamp)
-
-
 
         result = query.execute()
         dates = []
@@ -96,7 +96,8 @@ def plot_customer_daily_energy():
         #print output_string#'%.1f' % (p[0] * 3600 * 24), 'kWh per day'
         print str(c[0]) + ',' + str(c[1]) + ',' + str(c[2]) + ',',
         print ('%.1f' % watthours.mean()) + ',',
-        print ('%.3f' % (p[0] * 3600 * 24))
+        print ('%.3f' % (p[0] * 3600 * 24)) + ',',
+        print len(dates)
         ax[0].text(0.05, 0.7, output_string, transform=ax[0].transAxes)
         fit_timebase = np.linspace(0, (date_max - date_min).total_seconds(), 10)
         fit_energy = np.polyval(p, fit_timebase)
