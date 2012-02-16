@@ -11,7 +11,8 @@ def get_pins(meter_list):
     metadata = sa.MetaData('postgres://postgres:postgres@localhost:5432/gateway')
     t = sa.Table('view_meter', metadata, autoload=True)
     q = sa.select([t.c.pin],
-                   whereclause=sa.and_(t.c.meter_name.in_(meter_list)))
+                   whereclause=sa.and_(t.c.meter_name.in_(meter_list),
+                                       t.c.ip_address!='192.168.1.200'))
     result = q.execute()
 
     pl = [r.pin for r in result]
@@ -42,3 +43,4 @@ def get_credit_for_pin(pin, date_start, date_end):
     gd = p.Series(gd['credit'], index=gd['meter_timestamp'])
 
     return gd
+
