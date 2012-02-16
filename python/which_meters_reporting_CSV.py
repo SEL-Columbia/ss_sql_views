@@ -14,8 +14,11 @@ to output directly to file::
 from __future__ import division
 
 import datetime as dt
-date_start = dt.datetime(2011, 12, 01)
-date_end = dt.datetime(2011, 12, 03)
+date_start = dt.datetime(2012, 2,  1)
+date_end   = dt.datetime(2012, 2,  14)
+now        = dt.datetime.now()
+date_end   = dt.datetime(now.year, now.month, now.day)
+date_start = date_end - dt.timedelta(days=1)
 
 def which_meters_reporting_CSV():
     import sqlalchemy as sa
