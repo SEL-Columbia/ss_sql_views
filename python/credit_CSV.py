@@ -3,6 +3,8 @@ script to create CSV of credit values for all circuits
 will output CSV with
 rows - individual circuits, identified by pin number
 cols - credit sample for each date
+
+warning, dates missing from all circuits to not appear in index
 '''
 
 meter_list = ('ml01','ml02','ml03','ml04','ml07','ml08')
