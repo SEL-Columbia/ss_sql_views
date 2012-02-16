@@ -5,6 +5,7 @@ drop view view_primary_log cascade;
 create view view_primary_log as
 select distinct
        l.date as meter_timestamp,
+       p.created as gateway_timestamp,
        p.circuit_id,
        p.watthours,
        p.credit,
