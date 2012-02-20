@@ -44,3 +44,44 @@ def get_credit_for_pin(pin, date_start, date_end):
 
     return gd
 
+'''
+takes circuit_id and returns pandas series for watthours
+between date_start and date_end
+
+warning - does not gracefully handle empty query result
+'''
+def get_watthours_for_circuit_id(circuit_id, date_start, date_end):
+    import sqlalchemy as sa
+    metadata = sa.MetaData('postgres://postgres:postgres@localhost:5432/gateway')
+    t = sa.Table('view_primary_log', metadata, autoload=True)
+    query = sa.select([t.c.watthours,
+                       t.c.meter_timestamp],
+                       whereclause=sa.and_(t.c.circuit_id==circuit_id,
+                                           t.c.meter_timestamp<date_end,
+                                           t.c.meter_timestamp>date_start),
+                       order_by=t.c.meter_timestamp)
+    result = query.execute()
+    # todo: deal with empty query result
+    import pandas as p
+    gd = p.DataFrame(result.fetchall(), columns=result.keys())
+    gd = p.Series(gd['watthours'], index=gd['meter_timestamp'])
+    return gd
+
+'''
+gets circuit list for all circuits in database
+'''
+def get_circuit_list():
+    import sqlalchemy as sa
+    metadata = sa.MetaData('postgres://postgres:postgres@localhost:5432/gateway')
+    vm = sa.Table('view_meter', metadata, autoload=True )
+    # get list of circuits
+    query = sa.select([vm.c.circuit_id,
+                       vm.c.meter_name,
+                       vm.c.ip_address],
+                       order_by=(vm.c.meter_name, vm.c.ip_address)
+                       )
+    result = query.execute()
+    circuit_list = []
+    for r in result:
+        circuit_list.append((r.circuit_id, r.meter_name, r.ip_address))
+    return circuit_list
