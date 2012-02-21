@@ -22,9 +22,6 @@ import datetime as dt
 date_start = dt.datetime(2011,9,1)
 date_end = dt.datetime(2012,2,1)
 
-import pandas as p
-
-
 # place time series for credit of each pin in a dictionary
 d = {}
 for i, c in enumerate(circuit_dict_list):
@@ -44,7 +41,7 @@ for i, c in enumerate(circuit_dict_list):
         d[label] = sampled_watthours
 
 # assemble dictionary into dataframe
-#import pandas as p
+import pandas as p
 df = p.DataFrame(d)
 
 # transpose dataframe and output to CSV
