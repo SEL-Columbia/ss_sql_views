@@ -7,6 +7,10 @@ cols - credit sample for each date
 warning, dates missing from all circuits to not appear in index
 '''
 
+# these lines control whether or not all circuits are queried
+filter_by_meter_list = True
+meter_list = ['ml01', 'ml02', 'ml03', 'ml04', 'ml07', 'ml08']
+
 # get list of pins corresponding to meters in meter_list
 import offline_gateway as og
 circuit_dict_list = og.get_circuit_dict_list()
@@ -24,12 +28,20 @@ import pandas as p
 # place time series for credit of each pin in a dictionary
 d = {}
 for i, c in enumerate(circuit_dict_list):
-    meter_string = c['meter_name'] + '-' + c['ip_address'][-2:]
-    print 'querying for', i, 'th circuit =', meter_string
-    watthours = og.get_watthours_for_circuit_id(c['circuit_id'], date_start, date_end)
-    # subsample credit to get 23rd hour sample using boolean mask/index
-    sampled_watthours = watthours[[True if ind.hour==23 else False for ind in watthours.index]]
-    d[meter_string] = sampled_watthours
+
+    if not filter_by_meter_list or c['meter_name'] in meter_list:
+
+        # query database
+        print 'querying for', i, 'th circuit =', c['meter_name'], c['ip_address'], c['pin']
+        watthours = og.get_watthours_for_circuit_id(c['circuit_id'], date_start, date_end)
+
+        # subsample credit to get 23rd hour sample using boolean mask/index
+        sampled_watthours = watthours[[True if ind.hour==23 else False for ind in watthours.index]]
+
+        # append to dictionary
+        #label = c['meter_name'] + '-' + c['ip_address'][-2:]
+        label = c['pin']
+        d[label] = sampled_watthours
 
 # assemble dictionary into dataframe
 #import pandas as p
