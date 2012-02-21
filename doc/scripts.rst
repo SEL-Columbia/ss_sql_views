@@ -2,6 +2,8 @@ Scripts
 =======
 
 
+
+.. automodule:: offline_gateway
 .. automodule:: aggregated_customer_energy
 .. automodule:: customer_energy_histogram
 .. automodule:: customer_power_histogram
