@@ -87,3 +87,46 @@ def get_circuit_list():
     for r in result:
         circuit_list.append((r.circuit_id, r.meter_name, r.ip_address))
     return circuit_list
+
+def get_circuit_dict_list():
+    import sqlalchemy as sa
+    metadata = sa.MetaData('postgres://postgres:postgres@localhost:5432/gateway')
+    vm = sa.Table('view_meter', metadata, autoload=True )
+    # get list of circuits
+    query = sa.select([vm.c.circuit_id,
+                       vm.c.meter_name,
+                       vm.c.ip_address],
+                       order_by=(vm.c.meter_name, vm.c.ip_address)
+                       )
+    result = query.execute()
+    circuit_dict_list = []
+    for r in result:
+        circuit_dict_list.append({'circuit_id':r.circuit_id,
+                                  'meter_name':r.meter_name,
+                                  'ip_address':r.ip_address})
+    return circuit_dict_list
+
+'''
+takes pin and dates as input
+returns pandas series of credit with dates as index
+'''
+def get_energy_for_pin(pin, date_start, date_end):
+    import sqlalchemy as sa
+    import pandas as p
+
+    metadata = sa.MetaData('postgres://postgres:postgres@localhost:5432/gateway')
+    t = sa.Table('view_primary_log', metadata, autoload=True)
+
+    q = sa.select([t.c.meter_timestamp,
+                   t.c.watthours],
+                   whereclause=sa.and_(t.c.meter_timestamp >= date_start,
+                                       t.c.meter_timestamp < date_end,
+                                       t.c.pin == pin),
+                   order_by=t.c.meter_timestamp,
+                   distinct=True)
+    result = q.execute()
+
+    gd = p.DataFrame(result.fetchall(), columns=result.keys())
+    gd = p.Series(gd['watthours'], index=gd['meter_timestamp'])
+
+    return gd
