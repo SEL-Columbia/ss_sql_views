@@ -15,7 +15,7 @@ import sqlalchemy as sa
 import matplotlib.pyplot as plt
 import datetime as dt
 
-date_start = dt.datetime(2012, 2, 1)
+date_start = dt.datetime(2012, 1, 1)
 date_end = dt.datetime(2012, 2, 20)
 
 
@@ -47,7 +47,7 @@ def plot_customer_hourly_energy():
 
         positive_only = True
         if positive_only:
-            offset = offset[offset.values > 0]
+            offset = offset[offset.values >= 0]
 
         # plot each circuit daily energy values for all time
         f, ax = plt.subplots(1, 1, sharex=True)
