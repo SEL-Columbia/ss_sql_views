@@ -96,7 +96,8 @@ def get_circuit_dict_list():
     # get list of circuits
     query = sa.select([vm.c.circuit_id,
                        vm.c.meter_name,
-                       vm.c.ip_address],
+                       vm.c.ip_address,
+                       vm.c.pin],
                        order_by=(vm.c.meter_name, vm.c.ip_address)
                        )
     result = query.execute()
@@ -104,7 +105,8 @@ def get_circuit_dict_list():
     for r in result:
         circuit_dict_list.append({'circuit_id':r.circuit_id,
                                   'meter_name':r.meter_name,
-                                  'ip_address':r.ip_address})
+                                  'ip_address':r.ip_address,
+                                  'pin':r.pin})
     return circuit_dict_list
 
 '''
