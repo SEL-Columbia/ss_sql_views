@@ -54,12 +54,14 @@ def get_watthours_for_circuit_id(circuit_id, date_start, date_end):
     import sqlalchemy as sa
     metadata = sa.MetaData('postgres://postgres:postgres@localhost:5432/gateway')
     t = sa.Table('view_primary_log', metadata, autoload=True)
-    query = sa.select([t.c.watthours,
+    query = sa.select([sa.func.max(t.c.watthours).label('watthours'),
                        t.c.meter_timestamp],
                        whereclause=sa.and_(t.c.circuit_id==circuit_id,
                                            t.c.meter_timestamp<date_end,
                                            t.c.meter_timestamp>date_start),
-                       order_by=t.c.meter_timestamp)
+                       order_by=t.c.meter_timestamp,
+                       group_by=t.c.meter_timestamp,
+                       distinct=True)
     result = query.execute()
     # todo: deal with empty query result
     import pandas as p
