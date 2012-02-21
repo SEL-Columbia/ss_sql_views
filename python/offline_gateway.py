@@ -1,4 +1,7 @@
 '''
+offline_gateway.py
+==================
+
 shared library for offline gateway
 '''
 
@@ -89,6 +92,9 @@ def get_circuit_list():
         circuit_list.append((r.circuit_id, r.meter_name, r.ip_address))
     return circuit_list
 
+'''
+returns a list of dictionaries for every circuit in the database
+'''
 def get_circuit_dict_list():
     import sqlalchemy as sa
     metadata = sa.MetaData('postgres://postgres:postgres@localhost:5432/gateway')
