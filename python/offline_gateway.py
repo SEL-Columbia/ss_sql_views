@@ -71,6 +71,7 @@ def get_watthours_for_circuit_id(circuit_id, date_start, date_end):
 
 '''
 gets circuit list for all circuits in database
+returns list of tuples with (circuit_id, meter_name, ip_address)
 '''
 def get_circuit_list():
     import sqlalchemy as sa
