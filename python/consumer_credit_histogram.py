@@ -88,8 +88,8 @@ def consumer_credit_histogram(date_start, date_end, axes):
 
     axes.hist(percentage_with_credit,
               bins=np.arange(0, 1.1, 0.1),
-              #cumulative=True,
-              #normed=True
+              cumulative=True,
+              normed=True
               )
     axes.set_title(str(date_start) + ' - ' + str(date_end))
     axes.set_xlabel('Percentage of Time With Credit Available')
@@ -102,19 +102,22 @@ def consumer_credit_histogram(date_start, date_end, axes):
 
 if __name__ == '__main__':
 
-    multiple = False
+    multiple = True
 
     import numpy as np
     import matplotlib.pyplot as plt
-    #f, ax = plt.subplots(4,1, sharey=True)
-    f, ax = plt.subplots(1,1)
 
-    date_start = dt.datetime(2011, 9, 01)
-    date_end   = dt.datetime(2011, 10, 01)
+    if multiple:
+        f, ax = plt.subplots(4,1, sharey=True, figsize=(8,20))
+    else:
+        f, ax = plt.subplots(1,1)
 
-    consumer_credit_histogram(date_start=date_start,
-                           date_end=date_end,
-                           axes=ax)
+        date_start = dt.datetime(2011, 9, 01)
+        date_end   = dt.datetime(2011, 10, 01)
+
+        consumer_credit_histogram(date_start=date_start,
+                               date_end=date_end,
+                               axes=ax)
     if multiple == True:
         date_start = dt.datetime(2011, 9, 01)
         date_end   = dt.datetime(2011, 10, 01)
@@ -145,4 +148,5 @@ if __name__ == '__main__':
                                axes=ax[3])
 
 
-    plt.show()
+    #plt.show()
+    f.savefig('credit_histogram.pdf')
