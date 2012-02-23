@@ -1,4 +1,7 @@
 '''
+energy_CSV.py
+-------------
+
 script to create CSV of credit values for all circuits
 will output CSV with
 rows - individual circuits, identified by pin number
@@ -19,8 +22,8 @@ circuit_dict_list = og.get_circuit_dict_list()
 #circuit_dict_list = circuit_dict_list[:2]
 
 import datetime as dt
-date_start = dt.datetime(2011,9,1)
-date_end = dt.datetime(2012,2,1)
+date_start = dt.datetime(2011, 10, 1)
+date_end   = dt.datetime(2012, 11, 1)
 
 # place time series for credit of each pin in a dictionary
 d = {}
