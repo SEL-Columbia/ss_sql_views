@@ -16,14 +16,18 @@ meter_list = ['ml01', 'ml02', 'ml03', 'ml04', 'ml07', 'ml08']
 
 # get list of pins corresponding to meters in meter_list
 import offline_gateway as og
-circuit_dict_list = og.get_circuit_dict_list()
+circuit_dict_list = og.get_circuit_dict_list(mains=False)
 
 # use subsample while debugging
 #circuit_dict_list = circuit_dict_list[:20]
 
+# choose method of labeling data
+#method = 'meter'
+method = 'pin'
+
 import datetime as dt
-date_start = dt.datetime(2012, 1, 1)
-date_end   = dt.datetime(2012, 2, 1)
+date_start = dt.datetime(2011, 12, 1)
+date_end   = dt.datetime(2012, 1, 1)
 
 # place time series for credit of each pin in a dictionary
 d = {}
@@ -31,38 +35,27 @@ for i, c in enumerate(circuit_dict_list):
 
     if not filter_by_meter_list or c['meter_name'] in meter_list:
 
-        #choose method of labeling data
-        #label = c['meter_name'] + '-' + c['ip_address'][-2:]
-        label = c['pin']
+        # generate appropriate dictionary key
+        if method == 'meter':
+            label = c['meter_name'] + '-' + c['ip_address'][-2:]
+        if method == 'pin':
+            label = c['pin']
 
         # query database
         print 'querying for', i, 'th circuit =', label
         watthours = og.get_watthours_for_circuit_id(c['circuit_id'], date_start, date_end)
 
-        print 'calculating'
-        # create series with date-only index for 23 sample
-        wh23 = watthours[[True if i.hour == 23 else False for i in watthours.index]]
-        in23 = [dt.datetime(i.year, i.month, i.day) for i in wh23.index]
-        import pandas as p
-        wh23 = p.Series(data=wh23.values, index=in23)
-
-        # create series with day-before date-only index for midnight sample
-        wh24 = watthours[[True if i.hour == 0 else False for i in watthours.index]]
-        in24 = [dt.datetime(i.year, i.month, i.day) - dt.timedelta(days=1) for i in wh24.index]
-        import pandas as p
-        wh24 = p.Series(data=wh24.values, index=in24)
-
-        mask = [True if v >= 0 else False for v in wh24 - wh23]
-
-        combiner = lambda x, y: x if x >= y else y
-        heuristic_watthours = wh24.combine(wh23, combiner)
+        # get daily sampled watthours
+        daily_watthours = og.get_daily_energy_from_hourly_energy(watthours)
 
         # append to dictionary
-        d[label] = heuristic_watthours
+        d[label] = daily_watthours
 
 # assemble dictionary into dataframe
 import pandas as p
 df = p.DataFrame(d)
 
 # transpose dataframe and output to CSV
-df.T.to_csv('energy_hourly.csv')
+filename = 'energy_daily_' + str(date_start.year) + '-' + str(date_start.month)
+filename += '_' + method + '.csv'
+df.T.to_csv(filename)

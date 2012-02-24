@@ -6,6 +6,31 @@ shared library for offline gateway
 '''
 
 '''
+takes series of hourly data and subsamples by day
+if midnight is less than 11pm it uses 11pm sample
+otherwise it uses the midnight sample
+'''
+def get_daily_energy_from_hourly_energy(watthours):
+    import datetime as dt
+    import pandas as p
+
+    # create series with date-only index for 23 sample
+    wh23 = watthours[[True if i.hour == 23 else False for i in watthours.index]]
+    in23 = [dt.datetime(i.year, i.month, i.day) for i in wh23.index]
+    wh23 = p.Series(data=wh23.values, index=in23)
+
+    # create series with day-before date-only index for midnight sample
+    wh24 = watthours[[True if i.hour == 0 else False for i in watthours.index]]
+    in24 = [dt.datetime(i.year, i.month, i.day) - dt.timedelta(days=1) for i in wh24.index]
+    wh24 = p.Series(data=wh24.values, index=in24)
+
+    # take midnight sample only if greater or equal to 11pm sample
+    combiner = lambda x, y: x if x >= y else y
+    daily_watthours = wh24.combine(wh23, combiner)
+
+    return daily_watthours
+
+'''
 returns list of pins for circuits in meter_list
 '''
 def get_pins(meter_list):
