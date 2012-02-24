@@ -73,6 +73,25 @@ def get_watthours_for_circuit_id(circuit_id, date_start, date_end):
     gd = p.Series(gd['watthours'], index=gd['meter_timestamp'])
     return gd
 
+def get_credit_for_circuit_id(circuit_id, date_start, date_end):
+    import sqlalchemy as sa
+    metadata = sa.MetaData('postgres://postgres:postgres@localhost:5432/gateway')
+    t = sa.Table('view_primary_log', metadata, autoload=True)
+    query = sa.select([sa.func.max(t.c.credit).label('credit'),
+                       t.c.meter_timestamp],
+                       whereclause=sa.and_(t.c.circuit_id==circuit_id,
+                                           t.c.meter_timestamp<=date_end,
+                                           t.c.meter_timestamp>date_start),
+                       order_by=t.c.meter_timestamp,
+                       group_by=t.c.meter_timestamp,
+                       distinct=True)
+    result = query.execute()
+    # todo: deal with empty query result
+    import pandas as p
+    gd = p.DataFrame(result.fetchall(), columns=result.keys())
+    gd = p.Series(gd['credit'], index=gd['meter_timestamp'])
+    return gd
+
 '''
 gets circuit list for all circuits in database
 returns list of tuples with (circuit_id, meter_name, ip_address)
