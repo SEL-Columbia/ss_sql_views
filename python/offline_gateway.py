@@ -140,17 +140,26 @@ def get_circuit_list():
 '''
 returns a list of dictionaries for every circuit in the database
 '''
-def get_circuit_dict_list():
+def get_circuit_dict_list(mains=True):
     import sqlalchemy as sa
     metadata = sa.MetaData('postgres://postgres:postgres@localhost:5432/gateway')
     vm = sa.Table('view_meter', metadata, autoload=True )
     # get list of circuits
-    query = sa.select([vm.c.circuit_id,
-                       vm.c.meter_name,
-                       vm.c.ip_address,
-                       vm.c.pin],
-                       order_by=(vm.c.meter_name, vm.c.ip_address)
-                       )
+    if mains:
+        query = sa.select([vm.c.circuit_id,
+                           vm.c.meter_name,
+                           vm.c.ip_address,
+                           vm.c.pin],
+                           order_by=(vm.c.meter_name, vm.c.ip_address)
+                           )
+    else:
+        query = sa.select([vm.c.circuit_id,
+                           vm.c.meter_name,
+                           vm.c.ip_address,
+                           vm.c.pin],
+                           whereclause=vm.c.ip_address != '192.168.1.200',
+                           order_by=(vm.c.meter_name, vm.c.ip_address)
+                           )
     result = query.execute()
     circuit_dict_list = []
     for r in result:
