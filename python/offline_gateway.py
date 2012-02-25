@@ -94,9 +94,15 @@ def get_watthours_for_circuit_id(circuit_id, date_start, date_end):
     result = query.execute()
     # todo: deal with empty query result
     import pandas as p
-    gd = p.DataFrame(result.fetchall(), columns=result.keys())
-    gd = p.Series(gd['watthours'], index=gd['meter_timestamp'])
-    return gd
+    # check if query result is empty before attempting to create series
+    fetchall = result.fetchall()
+    if len(fetchall) > 0:
+        gd = p.DataFrame(fetchall, columns=result.keys())
+        gd = p.Series(gd['watthours'], index=gd['meter_timestamp'])
+        return gd
+    else:
+        # if no result return None
+        return None
 
 '''
 convenience function to get daily energy
