@@ -55,6 +55,6 @@ import pandas as p
 df = p.DataFrame(d)
 
 # transpose dataframe and output to CSV
-filename = 'credit_hourly_' + str(date_start.year) + '-' + str(date_start.month)
+filename = 'credit_daily_' + str(date_start.year) + '-' + str(date_start.month)
 filename += '_' + method + '.csv'
 df.T.to_csv(filename)
