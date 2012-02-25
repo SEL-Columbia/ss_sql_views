@@ -98,6 +98,14 @@ def get_watthours_for_circuit_id(circuit_id, date_start, date_end):
     gd = p.Series(gd['watthours'], index=gd['meter_timestamp'])
     return gd
 
+'''
+convenience function to get daily energy
+'''
+def get_daily_energy_for_circuit_id(circuit_id, date_start, date_end):
+    watthours = get_watthours_for_circuit_id(circuit_id, date_start, date_end)
+    daily_watthours = get_daily_energy_from_hourly_energy(watthours)
+    return daily_watthours
+
 def get_credit_for_circuit_id(circuit_id, date_start, date_end):
     import sqlalchemy as sa
     metadata = sa.MetaData('postgres://postgres:postgres@localhost:5432/gateway')

@@ -41,15 +41,9 @@ for i, c in enumerate(circuit_dict_list):
         if method == 'pin':
             label = c['pin']
 
-        # query database
+        # query database and append to dictionary
         print 'querying for', i, 'th circuit =', label
-        watthours = og.get_watthours_for_circuit_id(c['circuit_id'], date_start, date_end)
-
-        # get daily sampled watthours
-        daily_watthours = og.get_daily_energy_from_hourly_energy(watthours)
-
-        # append to dictionary
-        d[label] = daily_watthours
+        d[label] = og.get_daily_energy_for_circuit_id(c['circuit_id'], date_start, date_end)
 
 # assemble dictionary into dataframe
 import pandas as p
