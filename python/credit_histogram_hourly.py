@@ -1,5 +1,5 @@
 '''
-credit_histogram.py
+credit_histogram_hourly.py
 =========================
 
 plot histogram of all hourly credit values for a list of meters in meter_name
@@ -57,7 +57,7 @@ if __name__ == '__main__':
 
     date_start = dt.datetime(2011, 9, 01)
     date_end   = dt.datetime(2011, 10, 01)
-    credit_histogram(meter_names=meter_names,
+    credit_histogram_hourly(meter_names=meter_names,
                      date_end=date_end,
                      date_start=date_start,
                      axes=ax[0]
@@ -65,7 +65,7 @@ if __name__ == '__main__':
 
     date_start = dt.datetime(2011, 10, 01)
     date_end   = dt.datetime(2011, 11, 01)
-    credit_histogram(meter_names=meter_names,
+    credit_histogram_hourly(meter_names=meter_names,
                      date_end=date_end,
                      date_start=date_start,
                      axes=ax[1]
@@ -73,7 +73,7 @@ if __name__ == '__main__':
 
     date_start = dt.datetime(2011, 11, 01)
     date_end   = dt.datetime(2011, 12, 01)
-    credit_histogram(meter_names=meter_names,
+    credit_histogram_hourly(meter_names=meter_names,
                      date_end=date_end,
                      date_start=date_start,
                      axes=ax[2]
@@ -81,7 +81,7 @@ if __name__ == '__main__':
 
     date_start = dt.datetime(2011, 12, 01)
     date_end   = dt.datetime(2012,  1, 01)
-    credit_histogram(meter_names=meter_names,
+    credit_histogram_hourly(meter_names=meter_names,
                      date_end=date_end,
                      date_start=date_start,
                      axes=ax[3]
