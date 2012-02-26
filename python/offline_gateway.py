@@ -28,6 +28,9 @@ def get_daily_energy_from_hourly_energy(watthours):
     combiner = lambda x, y: x if x >= y else y
     daily_watthours = wh24.combine(wh23, combiner)
 
+    # filter NaN from result
+    daily_watthours = daily_watthours.dropna()
+
     return daily_watthours
 
 '''
@@ -110,7 +113,10 @@ convenience function to get daily energy
 def get_daily_energy_for_circuit_id(circuit_id, date_start, date_end):
     watthours = get_watthours_for_circuit_id(circuit_id, date_start, date_end)
     daily_watthours = get_daily_energy_from_hourly_energy(watthours)
-    return daily_watthours
+    if len(daily_watthours) > 0:
+        return daily_watthours
+    else:
+        return None
 
 def get_credit_for_circuit_id(circuit_id, date_start, date_end):
     import sqlalchemy as sa
