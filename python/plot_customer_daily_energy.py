@@ -22,22 +22,25 @@ if __name__ == '__main__':
 
     import offline_gateway as og
     cdl = og.get_circuit_dict_list(mains=True)
-    #cdl = cdl[:2]
+    #cdl = cdl[:1]
 
     for i, c in enumerate(cdl):
 
         filename = 'pcde-' + c['meter_name'] + '-' + c['ip_address'][-3:] + '.pdf'
-        print 'querying for' + filename
+        print 'querying for ' + filename
+
         daily_energy = og.get_daily_energy_for_circuit_id(c['circuit_id'], date_start, date_end)
+
+        if daily_energy == None:
+            continue
 
         # plot each circuit daily energy values for all time
         f, ax = plt.subplots(2, 1, sharex=True)
 
-        '''
         # fit linear slope to watthour data
         import numpy as np
-        dates = np.array(dates)
-        watthours = np.array(watthours)
+        dates = daily_energy.index
+        watthours = daily_energy.values
 
         date_max = max(dates)
         date_min = min(dates)
@@ -47,7 +50,7 @@ if __name__ == '__main__':
         p = np.polyfit(meter_timestamp, watthours, 1)
         output_string = '%.3f kWh per day' % (p[0] * 3600 * 24)
         #print output_string#'%.1f' % (p[0] * 3600 * 24), 'kWh per day'
-        print str(c[0]) + ',' + str(c[1]) + ',' + str(c[2]) + ',',
+        print str(c['meter_name']) + ',' + str(c['ip_address']) + ',' + str(c['circuit_id']) + ',',
         print ('%.1f' % watthours.mean()) + ',',
         print ('%.3f' % (p[0] * 3600 * 24)) + ',',
         print len(dates)
@@ -56,8 +59,7 @@ if __name__ == '__main__':
         fit_energy = np.polyval(p, fit_timebase)
         fit_timebase = [date_min + dt.timedelta(seconds=ft) for ft in fit_timebase]
         ax[0].plot_date(fit_timebase, fit_energy, 'k')
-        #ax[0].legend()
-        '''
+        ax[0].legend()
 
         ax[0].plot_date(daily_energy.index, daily_energy.values, mfc='#dddddd')
         ax[0].set_xlabel('Date')
