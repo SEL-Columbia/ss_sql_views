@@ -15,7 +15,7 @@ Note: The meter_list variable must also be changed (around line 42)
 
 # query parameters
 import datetime as dt
-date_start = dt.datetime(2011,01,01)
+date_start = dt.datetime(2012,01,01)
 date_end = dt.datetime(2012,02,01)
 ip_mains = '192.168.1.200'
 figure_filename = 'all_customers.pdf'
@@ -28,8 +28,8 @@ def aggregated_customer_energy():
     metadata = sa.MetaData('postgres://postgres:postgres@localhost:5432/gateway')
 
     # define table objects from database
-    #vpl = sa.Table('view_primary_log', metadata, autoload=True)
-    vm = sa.Table('view_midnight', metadata, autoload=True)
+    vm = sa.Table('view_primary_log', metadata, autoload=True)
+    #vm = sa.Table('view_midnight', metadata, autoload=True)
     m = sa.Table('meter', metadata, autoload=True)
 
     # get meter list from database
