@@ -15,8 +15,8 @@ date_end = dt.datetime(2012, 2, 1)
 
 # select based on meter list?
 circuit_dict_list = og.get_circuit_dict_list(mains=False)
-meter_list = ['ml01', 'ml02', 'ml03', 'ml04', 'ml05', 'ml06', 'ml07', 'ml08']
-#meter_list = ['ug01', 'ug02', 'ug03', 'ug04', 'ug05', 'ug06', 'ug07', 'ug08']
+#meter_list = ['ml01', 'ml02', 'ml03', 'ml04', 'ml05', 'ml06', 'ml07', 'ml08']
+meter_list = ['ug01', 'ug02', 'ug03', 'ug04', 'ug05', 'ug06', 'ug07', 'ug08']
 # get daily energy for each circuit
 
 import pandas as p
@@ -49,7 +49,7 @@ if remove_zeros:
 # plot histogram
 import matplotlib.pyplot as plt
 f = plt.figure()
-ax = f.add_axes((0.2,0.2,0.6,0.6))
+ax = f.add_axes((0.2,0.3,0.6,0.6))
 import numpy as np
 #ax.hist(watthour_list, bins=np.linspace(0,4000,41), facecolor='#dddddd')
 ax.hist(all_energy, bins=np.linspace(0,200,41), facecolor='#dddddd', normed=True)
@@ -69,7 +69,7 @@ f.text(0.01,0.01, annotation)
 #ax.set_title('Mali Daily Electricity Consumption')
 #ax.set_title('Uganda Mains Electricity Consumption')
 #f.savefig(country+'_mains_histogram.pdf')
-f.savefig('mali_histogram.pdf')
+#f.savefig('mali_histogram.pdf')
 f.savefig('uganda_histogram.pdf')
 
 print 'number of datapoints = ', len(all_energy)
