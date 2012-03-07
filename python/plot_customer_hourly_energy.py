@@ -2,38 +2,66 @@
 plot_customer_hourly_energy.py
 -----------------------------
 
-Loops through all circuits and creates pdf of daily watthours and credit.
-
-Watthours are calculated based on the midnight sample.  This has a main
-weakness due to the watthour reset bug.
-
-Also includes linear fit to gauge if energy use is increasing over time.
-
 '''
 
 import sqlalchemy as sa
 import matplotlib.pyplot as plt
 import datetime as dt
 
-date_start = dt.datetime(2012, 2, 14)
-date_end = dt.datetime(2012, 2, 20)
+date_start = dt.datetime(2012, 2, 18)
+date_end = dt.datetime(2012, 3, 1)
 
-def get_circuit_list():
-    import sqlalchemy as sa
-    metadata = sa.MetaData('postgres://postgres:postgres@localhost:5432/gateway')
-    vm = sa.Table('view_meter', metadata, autoload=True )
-    # get list of circuits
-    query = sa.select([vm.c.circuit_id,
-                       vm.c.meter_name,
-                       vm.c.ip_address],
-                       order_by=(vm.c.meter_name, vm.c.ip_address),
-                       #limit=3
-                       )
-    result = query.execute()
-    circuit_list = []
-    for r in result:
-        circuit_list.append((r.circuit_id, r.meter_name, r.ip_address))
-    return circuit_list
+
+if __name__ == '__main__':
+
+    import offline_gateway as og
+    cdl = og.get_circuit_dict_list(mains=True)
+    #cdl = cdl[:1]
+
+    for i, c in enumerate(cdl):
+
+        filename = 'pche-' + c['meter_name'] + '-' + c['ip_address'][-3:] + '.pdf'
+        print 'querying for ' + filename
+
+        # grab hourly energy, if empty drop through loop
+        hourly_energy = og.get_watthours_for_circuit_id(c['circuit_id'], date_start, date_end)
+        if hourly_energy == None:
+            continue
+
+        # grab daily energy, if empty drop through loop
+        daily_energy = og.get_daily_energy_for_circuit_id(c['circuit_id'], date_start, date_end)
+        if daily_energy == None:
+            continue
+
+        # shift daily_energy index by one to line up better
+        import pandas as p
+        daily_energy = daily_energy.shift(1, offset=p.DateOffset(days=1))
+
+        # get hourly credit
+        credit = og.get_credit_for_circuit_id(c['circuit_id'], date_start, date_end)
+
+        # plot each circuit daily energy values for all time
+        f, ax = plt.subplots(2, 1, sharex=True)
+
+        # plot energy on axis 0
+        ax[0].plot_date(daily_energy.index, daily_energy.values, mfc='#dddddd', ms=15)
+        ax[0].plot_date(hourly_energy.index, hourly_energy.values, 'ko-')
+        ax[0].set_xlabel('Date')
+        ax[0].set_ylabel('Daily Watthours')
+        ax[0].set_xlim((date_start, date_end))
+        ax[0].set_title(filename)
+
+        # plot credit on axis 1
+        ax[1].plot_date(credit.index, credit.values)
+
+        #plt.show()
+        f.autofmt_xdate()
+        f.savefig(filename)
+        plt.close()
+
+
+
+
 
 
 def plot_customer_hourly_energy():
@@ -88,6 +116,3 @@ def plot_customer_hourly_energy():
         f.autofmt_xdate()
         f.savefig(filename)
         plt.close()
-
-if __name__ == '__main__':
-    plot_customer_hourly_energy()
