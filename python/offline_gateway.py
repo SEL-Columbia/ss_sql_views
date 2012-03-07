@@ -33,6 +33,18 @@ def get_daily_energy_from_hourly_energy(watthours):
 
     return daily_watthours
 
+def get_daily_energy_from_hourly_energy_nr(watthours):
+    import datetime as dt
+    import pandas as p
+
+    # filter NaN from result
+    daily_watthours = watthours.shift(-1, offset=p.DateOffset(days=1)) - watthours
+
+    daily_watthours = daily_watthours[[True if i.hour == 0 else
+                                       False for i in daily_watthours.index]]
+
+    return daily_watthours
+
 '''
 returns list of pins for circuits in meter_list
 '''
@@ -48,7 +60,6 @@ def get_pins(meter_list):
 
     pl = [r.pin for r in result]
     return pl
-
 
 '''
 takes pin and dates as input
@@ -117,6 +128,18 @@ def get_daily_energy_for_circuit_id(circuit_id, date_start, date_end):
         return daily_watthours
     else:
         return None
+
+def get_daily_energy_for_circuit_id_nr(circuit_id, date_start, date_end):
+    watthours = get_watthours_for_circuit_id(circuit_id, date_start, date_end)
+    if watthours == None:
+        return None
+    daily_watthours = get_daily_energy_from_hourly_energy_nr(watthours)
+    if len(daily_watthours) > 0:
+        return daily_watthours
+    else:
+        return None
+
+
 
 def get_credit_for_circuit_id(circuit_id, date_start, date_end):
     import sqlalchemy as sa
