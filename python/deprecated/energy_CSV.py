@@ -16,14 +16,14 @@ meter_list = ['ml01', 'ml02', 'ml03', 'ml04', 'ml07', 'ml08']
 
 # get list of pins corresponding to meters in meter_list
 import offline_gateway as og
-circuit_dict_list = og.get_circuit_dict_list()
+circuit_dict_list = og.get_circuit_dict_list(mains=False)
 
 # use subsample while debugging
 #circuit_dict_list = circuit_dict_list[:2]
 
 import datetime as dt
-date_start = dt.datetime(2011, 10, 1)
-date_end   = dt.datetime(2012, 11, 1)
+date_start = dt.datetime(2011, 1, 1)
+date_end   = dt.datetime(2012, 2, 1)
 
 # place time series for credit of each pin in a dictionary
 d = {}
