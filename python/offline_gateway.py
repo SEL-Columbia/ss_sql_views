@@ -111,11 +111,10 @@ def get_watthours_for_circuit_id(circuit_id, date_start, date_end):
                        group_by=t.c.meter_timestamp,
                        distinct=True)
     result = query.execute()
-    # todo: deal with empty query result
-    import pandas as p
     # check if query result is empty before attempting to create series
     fetchall = result.fetchall()
     if len(fetchall) > 0:
+        import pandas as p
         gd = p.DataFrame(fetchall, columns=result.keys())
         gd = p.Series(gd['watthours'], index=gd['meter_timestamp'])
         return gd
@@ -165,11 +164,15 @@ def get_credit_for_circuit_id(circuit_id, date_start, date_end):
                        group_by=t.c.meter_timestamp,
                        distinct=True)
     result = query.execute()
-    # todo: deal with empty query result
-    import pandas as p
-    gd = p.DataFrame(result.fetchall(), columns=result.keys())
-    gd = p.Series(gd['credit'], index=gd['meter_timestamp'])
-    return gd
+    # check if query result is empty before attempting to create series
+    fetchall = result.fetchall()
+    if len(fetchall) > 0:
+        import pandas as p
+        gd = p.DataFrame(fetchall, columns=result.keys())
+        gd = p.Series(gd['credit'], index=gd['meter_timestamp'])
+        return gd
+    else:
+        return None
 
 '''
 gets circuit list for all circuits in database
