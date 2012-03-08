@@ -250,3 +250,43 @@ def get_energy_for_pin(pin, date_start, date_end):
     gd = p.Series(gd['watthours'], index=gd['meter_timestamp'])
 
     return gd
+
+def get_solar_kwh_for_meter_name(meter_name, date_start, date_end):
+    import sqlalchemy as sa
+    metadata = sa.MetaData('postgres://postgres:postgres@localhost:5432/gateway')
+    t = sa.Table('view_solar', metadata, autoload=True)
+    query = sa.select([t.c.solar_kwh, t.c.meter_timestamp],
+                       whereclause=sa.and_(t.c.meter_name==meter_name,
+                                           t.c.meter_timestamp<=date_end,
+                                           t.c.meter_timestamp>date_start),
+                       order_by=t.c.meter_timestamp)
+    result = query.execute()
+    # check for empty result
+    fetchall = result.fetchall()
+    if len(fetchall) > 0:
+        import pandas as p
+        gd = p.DataFrame(fetchall, columns=result.keys())
+        gd = p.Series(gd['solar_kwh'], index=gd['meter_timestamp'])
+        return gd
+    else:
+        return None
+
+def get_battery_voltage_for_meter_name(meter_name, date_start, date_end):
+    import sqlalchemy as sa
+    metadata = sa.MetaData('postgres://postgres:postgres@localhost:5432/gateway')
+    t = sa.Table('view_solar', metadata, autoload=True)
+    query = sa.select([t.c.battery_volts, t.c.meter_timestamp],
+                       whereclause=sa.and_(t.c.meter_name==meter_name,
+                                           t.c.meter_timestamp<=date_end,
+                                           t.c.meter_timestamp>date_start),
+                       order_by=t.c.meter_timestamp)
+    result = query.execute()
+    # check for empty result
+    fetchall = result.fetchall()
+    if len(fetchall) > 0:
+        import pandas as p
+        gd = p.DataFrame(fetchall, columns=result.keys())
+        gd = p.Series(gd['battery_volts'], index=gd['meter_timestamp'])
+        return gd
+    else:
+        return None
