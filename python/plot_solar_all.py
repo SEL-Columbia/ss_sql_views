@@ -45,21 +45,18 @@ if __name__ == '__main__':
         ax[1].set_ylabel('Battery Voltage (V)')
 
 
-
-        '''
         # calculate hourly power/energy
         import pandas as p
-        hourly_power = hourly_energy.shift(-1, offset=p.DateOffset(hours=1)) - hourly_energy
+        hourly_power = hourly_kwh.shift(-1, offset=p.DateOffset(hours=1)) - hourly_kwh
 
         ax[2].plot_date(hourly_power.index, hourly_power.values, 'ko')
-        ax[2].set_ylabel('Average Power (W)')
+        ax[2].set_ylabel('Average Power (kW)')
 
         # plot daily energy
-        daily_energy_nr = og.get_daily_energy_for_circuit_id_nr(c['circuit_id'], date_start, date_end)
+        daily_energy = hourly_kwh.shift(-1, offset=p.DateOffset(days=1)) - hourly_kwh
 
-        ax[3].plot_date(daily_energy_nr.index, daily_energy_nr.values, 'ko')
-        ax[3].set_ylabel('Daily Energy (Wh)')
-        '''
+        ax[3].plot_date(daily_energy.index, daily_energy.values, 'ko')
+        ax[3].set_ylabel('Daily Energy (kWh)')
 
         #plt.show()
         f.autofmt_xdate()
