@@ -16,7 +16,7 @@ if __name__ == '__main__':
 
     import offline_gateway as og
     cdl = og.get_circuit_dict_list(mains=True)
-    #cdl = cdl[:1]
+    #cdl = cdl[:10]
 
     for i, c in enumerate(cdl):
 
@@ -41,10 +41,10 @@ if __name__ == '__main__':
         credit = og.get_credit_for_circuit_id(c['circuit_id'], date_start, date_end)
 
         # plot each circuit daily energy values for all time
-        f, ax = plt.subplots(3, 1, sharex=True)
+        f, ax = plt.subplots(4, 1, sharex=True, figsize=(8,12))
 
         # plot energy on axis 0
-        ax[0].plot_date(daily_energy.index, daily_energy.values, mfc='#dddddd', ms=15)
+        #ax[0].plot_date(daily_energy.index, daily_energy.values, mfc='#dddddd', ms=15)
         ax[0].plot_date(hourly_energy.index, hourly_energy.values, 'ko-')
         ax[0].set_xlabel('Date')
         ax[0].set_ylabel('Daily Watthours')
@@ -52,7 +52,7 @@ if __name__ == '__main__':
         ax[0].set_title(filename)
 
         # plot credit on axis 1
-        ax[1].plot_date(credit.index, credit.values)
+        ax[1].plot_date(credit.index, credit.values, 'ko-')
         ax[1].set_ylabel('Credit Balance (XFCA)')
 
 
@@ -60,12 +60,14 @@ if __name__ == '__main__':
         import pandas as p
         hourly_power = hourly_energy.shift(-1, offset=p.DateOffset(hours=1)) - hourly_energy
 
-        ax[2].plot_date(hourly_power.index, hourly_power.values)
+        ax[2].plot_date(hourly_power.index, hourly_power.values, 'ko')
         ax[2].set_ylabel('Average Power (W)')
 
         # plot daily energy
+        daily_energy_nr = og.get_daily_energy_for_circuit_id_nr(c['circuit_id'], date_start, date_end)
 
-        #ax[3].plot_date(
+        ax[3].plot_date(daily_energy_nr.index, daily_energy_nr.values, 'ko')
+        ax[3].set_ylabel('Daily Energy (Wh)')
 
         #plt.show()
         f.autofmt_xdate()
