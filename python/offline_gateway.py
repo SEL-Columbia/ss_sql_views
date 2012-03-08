@@ -50,6 +50,16 @@ def get_daily_energy_from_hourly_energy_nr(watthours):
 
     return daily_watthours
 
+def get_circuit_id_for_mains(meter_name):
+    import sqlalchemy as sa
+    metadata = sa.MetaData('postgres://postgres:postgres@localhost:5432/gateway')
+    t = sa.Table('view_meter', metadata, autoload=True )
+    query = sa.select([t.c.circuit_id],
+                       whereclause=sa.and_(t.c.ip_address == '192.168.1.200',
+                                           t.c.meter_name == meter_name))
+    result = query.execute()
+    return result.first().circuit_id
+
 '''
 returns list of pins for circuits in meter_list
 '''
@@ -290,3 +300,54 @@ def get_battery_voltage_for_meter_name(meter_name, date_start, date_end):
         return gd
     else:
         return None
+
+def plot_solar_all(meter_name, date_start, date_end):
+    filename = 'psa-' + meter_name + '.pdf'
+    print 'querying for ' + filename
+
+
+    # plot each circuit daily energy values for all time
+    import matplotlib.pyplot as plt
+    f, ax = plt.subplots(6, 1, sharex=True, figsize=(8,12))
+
+    # plot hourly_kwh on axis 0
+    hourly_kwh = get_solar_kwh_for_meter_name(meter_name, date_start, date_end)
+    if hourly_kwh != None:
+        ax[0].plot_date(hourly_kwh.index, hourly_kwh.values, 'ko-')
+        #ax[0].set_xlabel('Date')
+        ax[0].set_ylabel('Delivered Energy (kWh)')
+        ax[0].set_xlim((date_start, date_end))
+        #ax[0].set_title(filename)
+
+    # plot battery_voltage on axis 1
+    battery_voltage = get_battery_voltage_for_meter_name(meter_name, date_start, date_end)
+    if battery_voltage != None:
+        ax[1].plot_date(battery_voltage.index, battery_voltage.values, 'ko-')
+        ax[1].set_ylabel('Battery Voltage (V)')
+
+
+    # calculate hourly power/energy
+    if hourly_kwh != None:
+        import pandas as p
+        hourly_power = hourly_kwh.shift(-1, offset=p.DateOffset(hours=1)) - hourly_kwh
+
+        ax[2].plot_date(hourly_power.index, hourly_power.values, 'ko')
+        ax[2].set_ylabel('Average Power (kW)')
+
+        # plot daily energy
+        daily_energy = hourly_kwh.shift(-1, offset=p.DateOffset(days=1)) - hourly_kwh
+
+        ax[3].plot_date(daily_energy.index, daily_energy.values, 'ko')
+        ax[3].set_ylabel('Daily Energy (kWh)')
+
+    # plot daily energy consumed by meter
+    cid = get_circuit_id_for_mains(meter_name)
+    mains_energy = get_watthours_for_circuit_id(cid, date_start, date_end)
+
+    if mains_energy != None:
+        ax[4].plot_date(mains_energy.index, mains_energy.values, 'ko')
+
+    #plt.show()
+    f.autofmt_xdate()
+    f.savefig(filename)
+    plt.close()
