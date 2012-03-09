@@ -317,6 +317,7 @@ def plot_solar_all(meter_name, date_start, date_end):
         #ax[0].set_xlabel('Date')
         ax[0].set_ylabel('Delivered Energy (kWh)')
         ax[0].set_xlim((date_start, date_end))
+        ax[0].grid(True)
         #ax[0].set_title(filename)
 
     # plot battery_voltage on axis 1
@@ -324,7 +325,7 @@ def plot_solar_all(meter_name, date_start, date_end):
     if battery_voltage != None:
         ax[1].plot_date(battery_voltage.index, battery_voltage.values, 'ko-')
         ax[1].set_ylabel('Battery Voltage (V)')
-
+        ax[1].grid(True)
 
     # calculate hourly power/energy
     if hourly_kwh != None:
@@ -333,21 +334,22 @@ def plot_solar_all(meter_name, date_start, date_end):
 
         ax[2].plot_date(hourly_power.index, hourly_power.values, 'ko')
         ax[2].set_ylabel('Average Power (kW)')
-
+        ax[2].grid(True)
         # plot daily energy
         daily_energy = hourly_kwh.shift(-1, offset=p.DateOffset(days=1)) - hourly_kwh
 
         ax[3].plot_date(daily_energy.index, daily_energy.values, 'ko')
         ax[3].set_ylabel('Daily Energy (kWh)')
-
+        ax[3].grid(True)
     # plot daily energy consumed by meter
     cid = get_circuit_id_for_mains(meter_name)
     mains_energy = get_watthours_for_circuit_id(cid, date_start, date_end)
 
     if mains_energy != None:
         ax[4].plot_date(mains_energy.index, mains_energy.values, 'ko')
-
+        ax[4].grid(True)
     #plt.show()
+    f.suptitle(meter_name)
     f.autofmt_xdate()
     f.savefig(filename)
     plt.close()
