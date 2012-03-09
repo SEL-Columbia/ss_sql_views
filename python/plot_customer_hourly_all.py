@@ -1,7 +1,7 @@
 '''
-plot_customer_hourly_energy.py
+plot_customer_hourly_all.py
 -----------------------------
-
+at a glance plot with watthours, credit, hourly power, and daily energy
 '''
 
 import sqlalchemy as sa
