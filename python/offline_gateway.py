@@ -14,8 +14,8 @@ def get_daily_energy_from_hourly_energy(watthours):
     import datetime as dt
     import pandas as p
 
-    if watthours == None:
-        return None
+    #if watthours == None:
+    #    return None
     # create series with date-only index for 23 sample
     wh23 = watthours[[True if i.hour == 23 else False for i in watthours.index]]
     in23 = [dt.datetime(i.year, i.month, i.day) for i in wh23.index]
@@ -127,36 +127,38 @@ def get_watthours_for_circuit_id(circuit_id, date_start, date_end):
         import pandas as p
         gd = p.DataFrame(fetchall, columns=result.keys())
         gd = p.Series(gd['watthours'], index=gd['meter_timestamp'])
-        return gd
+        return gd, 0
     else:
         # if no result return None
-        return None
+        return [], -1
 
 '''
 convenience function to get daily energy
 '''
 def get_daily_energy_for_circuit_id(circuit_id, date_start, date_end):
-    watthours = get_watthours_for_circuit_id(circuit_id, date_start, date_end)
-    if watthours == None:
-        return None
+    watthours, error = get_watthours_for_circuit_id(circuit_id, date_start, date_end)
+    #if watthours == None:
+    if error == -1:
+        return 0, -1
     daily_watthours = get_daily_energy_from_hourly_energy(watthours)
     if len(daily_watthours) > 0:
-        return daily_watthours
+        return daily_watthours, 0
     else:
-        return None
+        return daily_watthours, -1
 
 '''
 non-resetting
 '''
 def get_daily_energy_for_circuit_id_nr(circuit_id, date_start, date_end):
-    watthours = get_watthours_for_circuit_id(circuit_id, date_start, date_end)
-    if watthours == None:
-        return None
+    watthours, error = get_watthours_for_circuit_id(circuit_id, date_start, date_end)
+    #if watthours == None:
+    if error != 0:
+        return 0, -1
     daily_watthours = get_daily_energy_from_hourly_energy_nr(watthours)
     if len(daily_watthours) > 0:
-        return daily_watthours
+        return daily_watthours, 0
     else:
-        return None
+        return daily_watthours, -1
 
 '''
 returns credit for given circuit_id

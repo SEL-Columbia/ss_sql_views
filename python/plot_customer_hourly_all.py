@@ -8,8 +8,8 @@ import sqlalchemy as sa
 import matplotlib.pyplot as plt
 import datetime as dt
 
-date_start = dt.datetime(2012, 2, 18)
-date_end = dt.datetime(2012, 3, 15)
+date_start = dt.datetime(2012, 3, 1)
+date_end = dt.datetime(2012, 3, 28)
 
 
 if __name__ == '__main__':
@@ -24,13 +24,15 @@ if __name__ == '__main__':
         print 'querying for ' + filename
 
         # grab hourly energy, if empty drop through loop
-        hourly_energy = og.get_watthours_for_circuit_id(c['circuit_id'], date_start, date_end)
-        if hourly_energy == None:
+        hourly_energy, error = og.get_watthours_for_circuit_id(c['circuit_id'], date_start, date_end)
+        #if hourly_energy == -1:
+        if error != 0:
             continue
 
         # grab daily energy, if empty drop through loop
-        daily_energy = og.get_daily_energy_for_circuit_id(c['circuit_id'], date_start, date_end)
-        if daily_energy == None:
+        daily_energy, error = og.get_daily_energy_for_circuit_id(c['circuit_id'], date_start, date_end)
+        #if daily_energy == None:
+        if error != 0:
             continue
 
         # shift daily_energy index by one to line up better
@@ -64,10 +66,11 @@ if __name__ == '__main__':
         ax[2].set_ylabel('Average Power (W)')
 
         # plot daily energy
-        daily_energy_nr = og.get_daily_energy_for_circuit_id_nr(c['circuit_id'], date_start, date_end)
+        daily_energy_nr, error = og.get_daily_energy_for_circuit_id_nr(c['circuit_id'], date_start, date_end)
 
         ax[3].plot_date(daily_energy_nr.index, daily_energy_nr.values, 'ko')
         ax[3].set_ylabel('Daily Energy (Wh)')
+
 
         #plt.show()
         f.autofmt_xdate()
