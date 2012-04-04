@@ -147,6 +147,23 @@ def get_daily_energy_for_circuit_id(circuit_id, date_start, date_end):
         return daily_watthours, -1
 
 '''
+returns a pandas series of the energy consumed over each hour
+in the index
+'''
+def get_hourly_energy_for_circuit_id(circuit_id, date_start, date_end):
+    watthours, error = get_watthours_for_circuit_id(circuit_id, date_start, date_end)
+    # if error from get_watthours return None and error, else calculate hourly_energy
+    if error == 0:
+        import pandas as p
+        hourly_energy = watthours.shift(-1, offset=p.DateOffset(hours=1)) - watthours
+    else:
+        return None, -1
+    if len(hourly_energy) > 0:
+        return hourly_energy, 0
+    else:
+        return None, -1
+
+'''
 non-resetting
 '''
 def get_daily_energy_for_circuit_id_nr(circuit_id, date_start, date_end):
