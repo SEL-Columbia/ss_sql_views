@@ -279,9 +279,9 @@ def get_solar_kwh_for_meter_name(meter_name, date_start, date_end):
         import pandas as p
         gd = p.DataFrame(fetchall, columns=result.keys())
         gd = p.Series(gd['solar_kwh'], index=gd['meter_timestamp'])
-        return gd
+        return gd, 0
     else:
-        return None
+        return None, -1
 
 def get_battery_voltage_for_meter_name(meter_name, date_start, date_end):
     import sqlalchemy as sa
@@ -299,9 +299,9 @@ def get_battery_voltage_for_meter_name(meter_name, date_start, date_end):
         import pandas as p
         gd = p.DataFrame(fetchall, columns=result.keys())
         gd = p.Series(gd['battery_volts'], index=gd['meter_timestamp'])
-        return gd
+        return gd, 0
     else:
-        return None
+        return None, -1
 
 def plot_solar_all(meter_name, date_start, date_end):
     filename = 'psa-' + meter_name + '.pdf'
