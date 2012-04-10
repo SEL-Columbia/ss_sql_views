@@ -55,4 +55,8 @@ df = p.DataFrame(d)
 # transpose dataframe and output to CSV
 filename = 'energy_daily_' + str(date_start.year) + '-' + str(date_start.month)
 filename += '_' + method + '.csv'
-df.T.to_csv(filename)
+
+if columns == 'dates':
+    df.T.to_csv(filename)
+if columns == 'circuits':
+    df.to_csv(filename)
