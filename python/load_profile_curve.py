@@ -25,8 +25,10 @@ if __name__ == '__main__':
         print 'querying for', filename
 
         import offline_gateway as og
-        df = og.get_watthours_for_circuit_id(c[0], date_start, date_end)
+        df, error = og.get_watthours_for_circuit_id(c[0], date_start, date_end)
 
+        if error != 0:
+            continue
         # calculate discrete derivative
         import pandas as p
         offset = df - df.shift(1, offset=p.DateOffset(hours=1))
