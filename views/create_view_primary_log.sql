@@ -1,6 +1,6 @@
 -- this view creates a primary log table for better human parsing
 
-drop view view_primary_log cascade;
+--drop view view_primary_log cascade;
 
 create view view_primary_log as
 select distinct
