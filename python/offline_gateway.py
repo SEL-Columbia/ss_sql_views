@@ -50,6 +50,9 @@ def get_daily_energy_from_hourly_energy_nr(watthours):
 
     return daily_watthours
 
+'''
+get_circuit_id_for_mains
+'''
 def get_circuit_id_for_mains(meter_name):
     import sqlalchemy as sa
     metadata = sa.MetaData('postgres://postgres:postgres@localhost:5432/gateway')
@@ -170,7 +173,7 @@ def get_daily_energy_for_circuit_id_nr(circuit_id, date_start, date_end):
     watthours, error = get_watthours_for_circuit_id(circuit_id, date_start, date_end)
     #if watthours == None:
     if error != 0:
-        return 0, -1
+        return [], -1
     daily_watthours = get_daily_energy_from_hourly_energy_nr(watthours)
     if len(daily_watthours) > 0:
         return daily_watthours, 0
