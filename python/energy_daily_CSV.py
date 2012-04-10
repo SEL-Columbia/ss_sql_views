@@ -10,6 +10,9 @@ cols - credit sample for each date
 warning, dates missing from all circuits to not appear in index
 '''
 
+# boolean to say if data is non-resetting on resetting
+non_resetting_data = True
+
 # these lines control whether or not all circuits are queried
 filter_by_meter_list = True
 meter_list = ['ml00', 'ml01', 'ml02', 'ml03', 'ml04', 'ml05', 'ml06', 'ml07', 'ml08']
@@ -46,7 +49,10 @@ for i, c in enumerate(circuit_dict_list):
 
         # query database and append to dictionary
         print 'querying for', i, 'th circuit =', label
-        d[label] = og.get_daily_energy_for_circuit_id(c['circuit_id'], date_start, date_end)
+        if non_resetting_data:
+            d[label], error = og.get_daily_energy_for_circuit_id_nr(c['circuit_id'], date_start, date_end)
+        else:
+            d[label], error = og.get_daily_energy_for_circuit_id(c['circuit_id'], date_start, date_end)
 
 # assemble dictionary into dataframe
 import pandas as p
