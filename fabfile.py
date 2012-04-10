@@ -3,8 +3,10 @@ fabfile for offline gateway tasks
 '''
 
 import datetime as dt
-from fabric.api import local, lcd
+from fabric.api import local, lcd, run, env
 
+env.hosts = ['gateway.sharedsolar.org']
+env.user = 'root'
 
 def sync_db():
     time = dt.datetime.now().strftime('%y%m%d')
@@ -18,6 +20,7 @@ def sync_db():
         load_db(path, file)
     create_views()
     local('rm -rf temp')
+    show_disk_space()
 
 
 def download_db(url, path, file):
@@ -54,3 +57,6 @@ def create_views():
     local('psql -d gateway -f views/create_view_alarms.sql')
     local('psql -d gateway -f views/create_view_solar.sql')
     local('psql -d gateway -f views/create_view_recharge.sql')
+
+def show_disk_space():
+    run('df -h')
