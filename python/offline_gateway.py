@@ -173,7 +173,8 @@ def get_daily_energy_for_circuit_id_nr(circuit_id, date_start, date_end):
     watthours, error = get_watthours_for_circuit_id(circuit_id, date_start, date_end)
     #if watthours == None:
     if error != 0:
-        return [], -1
+        import pandas as p
+        return p.Series([], index=[]), -1
     daily_watthours = get_daily_energy_from_hourly_energy_nr(watthours)
     if len(daily_watthours) > 0:
         return daily_watthours, 0
