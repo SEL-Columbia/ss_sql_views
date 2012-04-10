@@ -12,22 +12,25 @@ warning, dates missing from all circuits to not appear in index
 
 # these lines control whether or not all circuits are queried
 filter_by_meter_list = True
-meter_list = ['ml01', 'ml02', 'ml03', 'ml04', 'ml07', 'ml08']
+meter_list = ['ml00', 'ml01', 'ml02', 'ml03', 'ml04', 'ml05', 'ml06', 'ml07', 'ml08']
+#meter_list = ['ml05']
 
 # get list of pins corresponding to meters in meter_list
 import offline_gateway as og
-circuit_dict_list = og.get_circuit_dict_list(mains=False)
+circuit_dict_list = og.get_circuit_dict_list(mains=True)
 
 # use subsample while debugging
 #circuit_dict_list = circuit_dict_list[:20]
 
 # choose method of labeling data
-#method = 'meter'
-method = 'pin'
+method = 'meter'
+#method = 'pin'
+
+columns = 'circuits'
 
 import datetime as dt
-date_start = dt.datetime(2011, 12, 1)
-date_end   = dt.datetime(2012, 1, 1)
+date_start = dt.datetime(2012, 3, 1)
+date_end   = dt.datetime(2012, 4, 1)
 
 # place time series for credit of each pin in a dictionary
 d = {}
