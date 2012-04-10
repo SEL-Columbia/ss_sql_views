@@ -14,6 +14,7 @@ date_end   = dt.datetime(2012, 01, 01)
 figure_file_name = 'percentage_with_credit.pdf'
 mains_ip = '192.168.1.200'
 meter_name = ('ml01', 'ml02', 'ml03', 'ml04', 'ml05', 'ml06', 'ml07', 'ml08')
+#meter_name = ('ug01', 'ug02', 'ug03', 'ug04', 'ug05', 'ug06', 'ug07', 'ug08')
 
 def consumer_credit_histogram(date_start, date_end, axes):
     #def percentage_with_credit():
@@ -93,7 +94,7 @@ def consumer_credit_histogram(date_start, date_end, axes):
               )
     axes.set_title(str(date_start) + ' - ' + str(date_end))
     axes.set_xlabel('Percentage of Time With Credit Available')
-    axes.set_ylabel('Number of Customers')
+    axes.set_ylabel('Fraction of Customers')
     axes.grid(True)
     #ax.set_xlabel('Average Daily Energy Use (Wh)')
     #ax.set_ylabel('Fraction of Time with Credit Available')
@@ -102,7 +103,7 @@ def consumer_credit_histogram(date_start, date_end, axes):
 
 if __name__ == '__main__':
 
-    multiple = True
+    multiple = False
 
     import numpy as np
     import matplotlib.pyplot as plt
@@ -112,8 +113,8 @@ if __name__ == '__main__':
     else:
         f, ax = plt.subplots(1,1)
 
-        date_start = dt.datetime(2011, 9, 01)
-        date_end   = dt.datetime(2011, 10, 01)
+        date_start = dt.datetime(2012, 2, 1)
+        date_end   = dt.datetime(2012, 3, 1)
 
         consumer_credit_histogram(date_start=date_start,
                                date_end=date_end,
