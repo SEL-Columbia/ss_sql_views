@@ -6,7 +6,8 @@ shared library for offline gateway
 '''
 
 import matplotlib.pyplot as plt
-import offline_gateway as og
+import numpy as np
+import datetime as dt
 
 '''
 takes series of hourly data and subsamples by day
@@ -328,7 +329,7 @@ def get_battery_voltage_for_meter_name(meter_name, date_start, date_end):
         return None, -1
 
 def analyze_load_profile_curve(circuit_id, date_start, date_end):
-    df, error = og.get_watthours_for_circuit_id(circuit_id, date_start, date_end)
+    df, error = get_watthours_for_circuit_id(circuit_id, date_start, date_end)
 
     if error != 0:
         return
@@ -355,8 +356,6 @@ def analyze_load_profile_curve(circuit_id, date_start, date_end):
     print len(ldc)
     print ldc.max() * len(ldc)
     print 'utilization factor', ldc.sum() / ldc.max() / len(ldc)
-
-
 
 def plot_solar_all(meter_name, date_start, date_end):
     filename = 'psa-' + meter_name + '.pdf'
@@ -467,7 +466,7 @@ def plot_hourly_power_profile(circuit_id, date_start, date_end, filename):
     plt.close()
 
 def plot_load_profile_curve_to_axis(circuit_id, date_start, date_end, ax, title=False, label=None):
-    df, error = og.get_watthours_for_circuit_id(circuit_id, date_start, date_end)
+    df, error = get_watthours_for_circuit_id(circuit_id, date_start, date_end)
 
     if error != 0:
         return
