@@ -5,6 +5,8 @@ offline_gateway.py
 shared library for offline gateway
 '''
 
+import matplotlib.pyplot as plt
+
 '''
 takes series of hourly data and subsamples by day
 if midnight is less than 11pm it uses 11pm sample
@@ -374,5 +376,92 @@ def plot_solar_all(meter_name, date_start, date_end):
     #plt.show()
     f.suptitle(meter_name)
     f.autofmt_xdate()
+    f.savefig(filename)
+    plt.close()
+
+def plot_power(circuit_id, date_start, date_end):
+    hourly_energy, error = get_watthours_for_circuit_id(circuit_id, date_start, date_end)
+    if error != 0:
+        return -1
+    # calculate hourly power/energy
+    import pandas as p
+    hourly_power = hourly_energy.shift(-1, offset=p.DateOffset(hours=1)) - hourly_energy
+    import matplotlib.pyplot as plt
+    f, ax = plt.subplots(1, 1)
+    ax.plot_date(hourly_power.index, hourly_power.values, 'ko')
+    ax.set_ylabel('Average Power (W)')
+    ax.set_ylim(ymin=0)
+    ax.grid(True)
+    plt.show()
+
+def plot_hourly_power_profile(circuit_id, date_start, date_end, filename):
+    import matplotlib.pyplot as plt
+    import datetime as dt
+    df = get_watthours_for_circuit_id(circuit_id, date_start, date_end)
+    df = df[0]
+    # offset by 1 hour and subtract
+    import pandas as p
+    offset = df.shift(-1, offset=p.DateOffset(hours=1)) - df
+
+    # screen out negative values resulting from drops
+    positive_only = True
+    if positive_only:
+        offset = offset[offset.values >= 0]
+
+    # extract hour information from series index for plotting
+    hour = [ind.hour for ind in offset.index]
+
+    # plotting of hour vs. power values to create profile
+    f = plt.figure()
+    ax = f.add_axes((0.2,0.2,0.6,0.6))
+    ax.plot(hour, offset.values, linestyle='',
+            marker='o', mec='#ffffff', alpha=0.2, mfc=None)
+    ax.set_xlabel('Hour of Day')
+    ax.set_ylabel('Average Hourly Power (W)')
+    ax.set_xticks((0,4,8,12,16,20,24))
+    ax.set_xlim((-1, 25))
+    ax.set_title(filename)
+
+    # add annotations to plot
+    annotation = []
+    annotation.append('plot generated ' + str(dt.datetime.now()))
+    annotation.append('date start = ' + str(date_start))
+    annotation.append('date end = ' + str(date_end))
+    annotation = '\n'.join(annotation)
+    f.text(0.01,0.01, annotation)
+
+    # save to file
+    f.savefig(filename, transparent=True)
+    plt.close()
+
+def plot_load_profile_curve(circuit_id, date_start, date_end, filename):
+    import offline_gateway as og
+    df, error = og.get_watthours_for_circuit_id(circuit_id, date_start, date_end)
+
+    if error != 0:
+        return
+    # calculate discrete derivative
+    import pandas as p
+    offset = df - df.shift(1, offset=p.DateOffset(hours=1))
+
+    positive_only = True
+    #positive_only = False
+    if positive_only:
+        offset = offset[offset.values >= 0]
+
+    # order values
+    offset.sort()
+
+    # create new series without date index but ordinal index
+    ldc = p.Series(offset.values)
+
+    # plot each circuit daily energy values for all time
+    f, ax = plt.subplots(1, 1, sharex=True)
+
+    # plot normalized ordinal index against values
+    ax.plot([float(i)/len(offset) for i in ldc.index], ldc.values)
+    #ax.set_xlabel('Date')
+    ax.set_ylabel('Average Hourly Power')
+    ax.set_title(filename)
     f.savefig(filename)
     plt.close()
