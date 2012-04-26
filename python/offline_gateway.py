@@ -6,6 +6,7 @@ shared library for offline gateway
 '''
 
 import matplotlib.pyplot as plt
+import offline_gateway as og
 
 '''
 takes series of hourly data and subsamples by day
@@ -465,8 +466,7 @@ def plot_hourly_power_profile(circuit_id, date_start, date_end, filename):
     f.savefig(filename, transparent=True)
     plt.close()
 
-def plot_load_profile_curve(circuit_id, date_start, date_end, filename):
-    import offline_gateway as og
+def plot_load_profile_curve_to_axis(circuit_id, date_start, date_end, ax, title=False, label=None):
     df, error = og.get_watthours_for_circuit_id(circuit_id, date_start, date_end)
 
     if error != 0:
@@ -480,19 +480,28 @@ def plot_load_profile_curve(circuit_id, date_start, date_end, filename):
     if positive_only:
         offset = offset[offset.values >= 0]
 
+    threshold_spurious = True
+    if threshold_spurious:
+        offset = offset[offset.values <= 1000]
+
     # order values
     offset.sort()
 
     # create new series without date index but ordinal index
     ldc = p.Series(offset.values)
 
-    # plot each circuit daily energy values for all time
-    f, ax = plt.subplots(1, 1, sharex=True)
-
     # plot normalized ordinal index against values
-    ax.plot([float(i)/len(offset) for i in ldc.index], ldc.values)
+    ax.plot([float(i)/len(offset) for i in ldc.index], ldc.values, label=label)
     #ax.set_xlabel('Date')
     ax.set_ylabel('Average Hourly Power')
-    ax.set_title(filename)
+    ax.set_ylim(ymin=0)
+    if title:
+        ax.set_title(filename)
+
+def plot_load_profile_curve_to_file(circuit_id, date_start, date_end, filename, title=False):
+
+    # plot each circuit daily energy values for all time
+    f, ax = plt.subplots(1, 1, sharex=True)
+    plot_load_profile_curve_to_axis(circuit_id, date_start, date_end, ax, title)
     f.savefig(filename)
     plt.close()
