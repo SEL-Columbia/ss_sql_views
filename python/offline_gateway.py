@@ -504,3 +504,25 @@ def plot_load_profile_curve_to_file(circuit_id, date_start, date_end, filename, 
     plot_load_profile_curve_to_axis(circuit_id, date_start, date_end, ax, title)
     f.savefig(filename)
     plt.close()
+
+def plot_date_fit(df, ax):
+    timestamp = np.array(df.index)
+    values = np.array(df.values)
+
+    date_minimum = min(timestamp)
+    date_maximum = max(timestamp)
+
+    timestamp = [(ms-date_minimum).total_seconds() for ms in timestamp]
+    p = np.polyfit(timestamp, values, 1)
+
+    output_string = '%.1f per day' % (p[0] * 3600 * 24)
+    #print meter_name, output_string#'%.1f' % (p[0] * 3600 * 24), 'kWh per day'
+    ax.text(0.05, 0.7, output_string, transform=ax.transAxes)
+    fit_timebase = np.linspace(0, (date_maximum-date_minimum).total_seconds(), 10)
+    fit_energy = np.polyval(p, fit_timebase)
+    fit_timebase = [date_minimum + dt.timedelta(seconds=ft) for ft in fit_timebase]
+
+    ax.plot_date(fit_timebase, fit_energy, 'k')
+
+    print p
+    return p
