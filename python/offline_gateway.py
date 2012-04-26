@@ -326,6 +326,37 @@ def get_battery_voltage_for_meter_name(meter_name, date_start, date_end):
     else:
         return None, -1
 
+def analyze_load_profile_curve(circuit_id, date_start, date_end):
+    df, error = og.get_watthours_for_circuit_id(circuit_id, date_start, date_end)
+
+    if error != 0:
+        return
+    # calculate discrete derivative
+    import pandas as p
+    offset = df - df.shift(1, offset=p.DateOffset(hours=1))
+
+    positive_only = True
+    #positive_only = False
+    if positive_only:
+        offset = offset[offset.values >= 0]
+
+    threshold_spurious = True
+    if threshold_spurious:
+        offset = offset[offset.values <= 1000]
+
+    # order values
+    offset.sort()
+
+    # create new series without date index but ordinal index
+    ldc = p.Series(offset.values)
+
+    print ldc.sum()
+    print len(ldc)
+    print ldc.max() * len(ldc)
+    print 'utilization factor', ldc.sum() / ldc.max() / len(ldc)
+
+
+
 def plot_solar_all(meter_name, date_start, date_end):
     filename = 'psa-' + meter_name + '.pdf'
     print 'querying for ' + filename
