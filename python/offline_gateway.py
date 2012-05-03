@@ -425,7 +425,7 @@ def plot_power(circuit_id, date_start, date_end):
     ax.grid(True)
     plt.show()
 
-def plot_hourly_power_profile(circuit_id, date_start, date_end, filename):
+def plot_hourly_power_profile(circuit_id, date_start, date_end, filename, title=True):
     import matplotlib.pyplot as plt
     import datetime as dt
     df = get_watthours_for_circuit_id(circuit_id, date_start, date_end)
@@ -451,7 +451,8 @@ def plot_hourly_power_profile(circuit_id, date_start, date_end, filename):
     ax.set_ylabel('Average Hourly Power (W)')
     ax.set_xticks((0,4,8,12,16,20,24))
     ax.set_xlim((-1, 25))
-    ax.set_title(filename)
+    if title:
+        ax.set_title(filename)
 
     # add annotations to plot
     annotation = []
