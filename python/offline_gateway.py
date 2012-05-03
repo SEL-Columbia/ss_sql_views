@@ -481,19 +481,19 @@ def plot_load_profile_curve_to_axis(circuit_id, date_start, date_end, ax, title=
 
     threshold_spurious = True
     if threshold_spurious:
-        offset = offset[offset.values <= 1000]
+        offset = offset[offset.values <= 700]
 
     # order values
     offset.sort()
 
     # create new series without date index but ordinal index
-    ldc = p.Series(offset.values)
+    ldc = p.Series(offset.values[::-1])
 
     # plot normalized ordinal index against values
     ax.plot([float(i)/len(offset) for i in ldc.index], ldc.values, label=label)
     #ax.set_xlabel('Date')
     ax.set_ylabel('Average Hourly Power')
-    ax.set_ylim(ymin=0)
+    ax.set_ylim(ymin=0, ymax=400)
     if title:
         ax.set_title(filename)
 
