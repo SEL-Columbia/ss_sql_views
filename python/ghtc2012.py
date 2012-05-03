@@ -57,6 +57,10 @@ def plot_two_ldc(date_start, date_end):
 def plot_two_bulb_profile(date_start, date_end):
     og.plot_hourly_power_profile(230, date_start, date_end, 'two_bulb_profile.pdf', title=False)
 
+def plot_freezer_profile(date_start, date_end):
+    og.plot_hourly_power_profile(96, date_start, date_end, 'freezer_profile.pdf', title=False)
+
+
 if __name__ == '__main__':
 
     date_start = dt.datetime(2012, 2, 15)
@@ -65,4 +69,6 @@ if __name__ == '__main__':
 
     date_start = dt.datetime(2012, 1, 1)
     date_end = dt.datetime(2012, 3, 1)
-    plot_two_bulb_profile(date_start, date_end)
+    #plot_two_bulb_profile(date_start, date_end)
+
+    plot_freezer_profile(dt.datetime(2012, 2, 1), dt.datetime(2012, 4, 15))
