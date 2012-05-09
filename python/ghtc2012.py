@@ -1,6 +1,7 @@
 import offline_gateway as og
 import datetime as dt
 import matplotlib.pyplot as plt
+import pandas as p
 
 '''
  25 "ml00"
@@ -60,6 +61,22 @@ def plot_two_bulb_profile(date_start, date_end):
 def plot_freezer_profile(date_start, date_end):
     og.plot_hourly_power_profile(96, date_start, date_end, 'freezer_profile.pdf', title=False)
 
+def tbl_efficiency(date_start, date_end):
+    print '% tbl_efficiency'
+    print '%', date_start
+    print '%', date_end
+    dl = []
+    for meter, cid in [('ml05', 57), ('ml06', 70), ('ml07', 102), ('ml08', 123)]:
+        d = og.analyze_load_profile_curve(cid, date_start, date_end)
+        og.plot_load_profile_curve_to_file(cid, date_start, date_end, meter+'-ldc.pdf')
+        dl.append(d)
+    df = p.DataFrame(dl)
+
+    for row in df.index:
+        print '%.2f' % df.ix[row]['capacity_factor'],
+        print '&',
+        print df.ix[row]['circuit_id'],
+        print '\\\\'
 
 if __name__ == '__main__':
 
@@ -71,4 +88,8 @@ if __name__ == '__main__':
     date_end = dt.datetime(2012, 3, 1)
     #plot_two_bulb_profile(date_start, date_end)
 
-    plot_freezer_profile(dt.datetime(2012, 2, 1), dt.datetime(2012, 4, 15))
+    #plot_freezer_profile(dt.datetime(2012, 2, 1), dt.datetime(2012, 4, 15))
+
+    date_start = dt.datetime(2012, 2, 15)
+    date_end = dt.datetime(2012, 4, 15)
+    tbl_efficiency(date_start, date_end)

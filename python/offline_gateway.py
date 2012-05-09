@@ -329,6 +329,9 @@ def get_battery_voltage_for_meter_name(meter_name, date_start, date_end):
         return None, -1
 
 def analyze_load_profile_curve(circuit_id, date_start, date_end):
+    #capacity = ldc.max()   # if capacity relative to max of ldc
+    capacity = 750.          # if capacity relative to rated power of inverter
+
     df, error = get_watthours_for_circuit_id(circuit_id, date_start, date_end)
 
     if error != 0:
@@ -344,7 +347,7 @@ def analyze_load_profile_curve(circuit_id, date_start, date_end):
 
     threshold_spurious = True
     if threshold_spurious:
-        offset = offset[offset.values <= 1000]
+        offset = offset[offset.values <= capacity]
 
     # order values
     offset.sort()
@@ -352,10 +355,16 @@ def analyze_load_profile_curve(circuit_id, date_start, date_end):
     # create new series without date index but ordinal index
     ldc = p.Series(offset.values)
 
-    print ldc.sum()
-    print len(ldc)
-    print ldc.max() * len(ldc)
-    print 'utilization factor', ldc.sum() / ldc.max() / len(ldc)
+
+    #print ldc.sum()
+    #print len(ldc)
+    #print capacity * len(ldc)
+    #print 'utilization factor', ldc.sum() / capacity / len(ldc)
+    d = {'total_watthours':ldc.sum(),
+         'total_hours':len(ldc),
+         'capacity_factor':ldc.sum() / capacity / len(ldc),
+         'circuit_id':circuit_id}
+    return d
 
 def plot_solar_all(meter_name, date_start, date_end):
     filename = 'psa-' + meter_name + '.pdf'
