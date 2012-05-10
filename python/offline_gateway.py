@@ -420,22 +420,55 @@ def plot_solar_all(meter_name, date_start, date_end):
     f.savefig(filename)
     plt.close()
 
-def plot_power(circuit_id, date_start, date_end):
+def plot_power(circuit_id,
+               date_start,
+               date_end,
+               filename='default_plot_power.pdf',
+               title=None):
+    '''
+    plot_power
+    ==========
+    outputs
+    -------
+    raw timeseries plot of hourly power demand for a specified circuit
+
+    inputs
+    ------
+    circuit_id : integer specifying database id for circuit
+    date_start : datetime object that describes start of data
+    date_end   : datetime object that describes end of data
+    filename   : string specifying name of output file
+    annotate   : boolean for output annotation on plot
+    title      : string that will be used as title for plot
+    '''
+
+    # get energy for circuit_id and daterange, return -1 on empty dataframe
     hourly_energy, error = get_watthours_for_circuit_id(circuit_id, date_start, date_end)
     if error != 0:
         return -1
-    # calculate hourly power/energy
-    import pandas as p
+
+    # calculate hourly power/energy using pandas shift
     hourly_power = hourly_energy.shift(-1, offset=p.DateOffset(hours=1)) - hourly_energy
-    import matplotlib.pyplot as plt
+
+    # create and label plot
     f, ax = plt.subplots(1, 1)
-    ax.plot_date(hourly_power.index, hourly_power.values, 'ko')
+    ax.plot_date(hourly_power.index, hourly_power.values, 'k')
     ax.set_ylabel('Average Power (W)')
     ax.set_ylim(ymin=0)
     ax.grid(True)
-    plt.show()
+    f.autofmt_xdate()
+
+    # title plot if argument supplied by caller
+    if title != None:
+        ax.set_title(title)
+
+    # save figure to file
+    f.savefig(filename)
 
 def plot_hourly_power_profile(circuit_id, date_start, date_end, filename, title=True):
+    '''
+    plots superimposed hourly profile
+    '''
     import matplotlib.pyplot as plt
     import datetime as dt
     df = get_watthours_for_circuit_id(circuit_id, date_start, date_end)
