@@ -1,6 +1,10 @@
 '''
 customer_energy_histogram.py
 ============================
+outputs
+-------
+a histogram displaying the frequency of customer daily energy values for
+a list of meters.
 
 inputs
 ------
@@ -26,7 +30,6 @@ def plot_customer_energy_histogram(meter_list=['ml01', 'ml02', 'ml03', 'ml04', '
                                    remove_zeros=True,
                                    title=None):
 
-
     # select all circuits from database (we will later filter)
     circuit_dict_list = get_circuit_dict_list(mains=False)
 
@@ -34,51 +37,65 @@ def plot_customer_energy_histogram(meter_list=['ml01', 'ml02', 'ml03', 'ml04', '
     all_energy = p.Series()
     all_energy = np.array([])
     num_circuits = 0
+
+    # iterate over circuit_dict_list and skip meters not in meter_list
     for cd in circuit_dict_list:
-        #print 'querying'
         if cd['meter_name'] not in meter_list:
             continue
+        print cd['circuit_id']
         num_circuits += 1
-        print num_circuits
-        de = get_daily_energy_for_circuit_id(cd['circuit_id'], date_start, date_end)
-        if de == None:
+        de, err = get_daily_energy_for_circuit_id(cd['circuit_id'], date_start, date_end)
+        if err != 0:
             continue
-        #de.values.astype(float)
         all_energy = np.hstack((all_energy, de.values))
 
-        # append de.values to all_energy
-    #1/0
-
+    # remove any days of zero consumption from array and histogram
     if remove_zeros:
         all_energy = all_energy[all_energy > 0]
-    # concatenate
 
     # plot histogram
     import matplotlib.pyplot as plt
     f = plt.figure()
-    ax = f.add_axes((0.2,0.3,0.6,0.6))
-    #import numpy as np
-    #ax.hist(watthour_list, bins=np.linspace(0,4000,41), facecolor='#dddddd')
+
+    # set plot boundary appropriately to make room for annotation
+    if annotate:
+        ax = f.add_axes((0.2,0.3,0.6,0.6))
+    else:
+        ax = f.add_axes((0.1, 0.1, 0.85, 0.8))
+
+    # plot and set labels
     ax.hist(all_energy, bins=np.linspace(0,200,41), facecolor='#dddddd', normed=True)
-    #ax.hist(watthour_list)
     ax.set_xlabel('Daily Electrical Energy Consumed (Wh)')
     ax.set_ylabel('Frequency of Observation')
+    if title != None:
+        ax.set_title(title)
 
-    # add annotations to plot
+    # create metadata and plot to stdout
     annotation = []
     annotation.append('plot generated ' + str(dt.datetime.now()))
     annotation.append('date start = ' + str(date_start))
     annotation.append('date end = ' + str(date_end))
     annotation.append('meter list = ' + str(meter_list))
     annotation = '\n'.join(annotation)
-    f.text(0.01,0.01, annotation)
-
-    if title != None:
-        ax.set_title(title)
-    f.savefig(filename)
-
+    print annotation
     print 'number of datapoints = ', len(all_energy)
     print 'possible observations = ', num_circuits * (date_end - date_start).days
 
+    # add metadata to plot
+    if annotate:
+        f.text(0.01, 0.01, annotation)
+
+    # save to file
+    f.savefig(filename)
+
+
 if __name__ == '__main__':
-    plot_customer_energy_histogram()
+
+    plot_customer_energy_histogram(meter_list=['ml01', 'ml02', 'ml03', 'ml04', 'ml05', 'ml06', 'ml07', 'ml08'],
+                                   title='Mali Customer Daily Energy Histogram',
+                                   filename='Mali_Histogram.pdf')
+    '''
+    plot_customer_energy_histogram(meter_list=['ug01', 'ug02', 'ug03', 'ug04', 'ug05', 'ug06', 'ug07', 'ug08'],
+                                   title='Uganda Customer Daily Energy Histogram',
+                                   filename='Uganda_Histogram.pdf')
+    '''
