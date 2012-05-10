@@ -14,9 +14,15 @@ def plot_two_ldc(date_start, date_end):
 
 if __name__ == '__main__':
 
+
     date_start = dt.datetime(2012, 2, 15)
     date_end = dt.datetime(2012, 4, 15)
-    plot_two_ldc(date_start, date_end)
+    #plot_two_ldc(date_start, date_end)
+
+    date_start = dt.datetime(2012, 3, 23)
+    date_end = dt.datetime(2012, 3, 31)
+    #og.plot_power(57, date_start, date_end, filename='ustda_profile.pdf', title=False)
+    og.plot_power(57, date_start, date_end, filename='ustda_profile.pdf', title='Hourly Microgrid Demand')
 
     '''
     og.plot_customer_energy_histogram(meter_list=['ml01', 'ml02', 'ml03', 'ml04', 'ml05', 'ml06', 'ml07', 'ml08'],
